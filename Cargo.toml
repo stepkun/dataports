@@ -4,5 +4,15 @@ resolver = "3"
 name = "dataports"
 version = "0.0.0"
 edition = "2024"
+license = "MIT/Apache-2.0"
+authors = ["stepkun <stephan.kunz@kabelbw.de>"]
+description = "Port abstractions for data types"
+repository = "https://github.com/stepkun/dataports.git"
+homepage = "http://github.com/stepkun/dataports.git"
+documentation = "https://docs.rs/dataports"
+readme = "README.md"
+#keywords = ["xml"]
+categories = ["development-tools"]
+exclude = ["laze*", "benches/**", "embedded/**", "examples/**", "tests/**"]
 
 [dependencies]
