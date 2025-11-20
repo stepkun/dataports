@@ -1,0 +1,8 @@
+# Copyright © 2025 Stephan Kunz
+[package]
+resolver = "3"
+name = "dataports"
+version = "0.0.0"
+edition = "2024"
+
+[dependencies]
