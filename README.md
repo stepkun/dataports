@@ -3,13 +3,9 @@ Port abstractions for data types
 
 ## License
 
-Licensed under either of
- * Apache License, Version 2.0 [LICENSE-APACHE](LICENSE-APACHE) or [source](http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license [LICENSE-MIT](LICENSE-MIT) or [source](http://opensource.org/licenses/MIT)
+Licensed with the fair use "NGMC" license, see [license file](https://github.com/stepkun/behaviortree/blob/main/LICENSE)
 
-at your option.
+## Contribution
 
-### Contribution
-
-Any contribution intentionally submitted for inclusion in the work by you shall be dual licensed as above,
-without any additional terms or conditions.
+Any contribution intentionally submitted for inclusion in the work by you,
+shall be licensed with the same "NGMC" license, without any additional terms or conditions.
