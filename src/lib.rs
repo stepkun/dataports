@@ -9,11 +9,13 @@ extern crate alloc;
 
 mod error;
 mod macros;
-mod port;
-mod port_provider;
+//mod port;
+mod port_description;
+//mod port_provider;
 mod remapping;
 
 // flatten
 pub use error::Error;
-pub use port::{Port, PortBase, InPort, InOutPort, OutPort};
-pub use port_provider::{PortProvider, DynamicPortProvider};
+//pub use port::{Port, PortBase, InPort, InOutPort, OutPort};
+pub use port_description::{PortDescription, PortDescriptionProvider};
+//pub use port_provider::{PortProvider, DynamicPortProvider};
