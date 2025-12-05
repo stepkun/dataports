@@ -11,11 +11,8 @@ pub trait PortDescriptionProvider {
 		if self
 			.port_description_list()
 			.iter()
-			.any(|description| match description {
-				crate::PortDescription::In(inner)
-				| crate::PortDescription::InOut(inner)
-				| crate::PortDescription::Out(inner) => inner.name == port_name,
-			}) {
+			.any(|description| description.deref().name == port_name)
+		{
 			return true;
 		}
 
@@ -27,11 +24,7 @@ pub trait PortDescriptionProvider {
 	fn port_description(&self, port_name: &str) -> Option<&PortDescription> {
 		self.port_description_list()
 			.iter()
-			.find(|description| match description {
-				crate::PortDescription::In(inner)
-				| crate::PortDescription::InOut(inner)
-				| crate::PortDescription::Out(inner) => inner.name == port_name,
-			})
+			.find(|description| (*description).deref().name == port_name)
 	}
 
 	/// List of provided [`Port`]'s.
