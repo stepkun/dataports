@@ -1,10 +1,11 @@
 // Copyright © 2025 Stephan Kunz
 //! [`dataports`](crate) errors.
 
+#![allow(clippy::match_single_binding)]
+
 /// Port errors.
 #[non_exhaustive]
-pub enum Error {
-}
+pub enum Error {}
 
 /// Only default implementation needed.
 impl core::error::Error for Error {}

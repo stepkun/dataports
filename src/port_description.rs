@@ -1,7 +1,7 @@
 // Copyright © 2025 Stephan Kunz
 //! [`dataports`](crate) [`PortDescription`] implementation.
 
-use core::str;
+use core::{ops::Deref, str};
 
 /// PortDescriptionProvider.
 pub trait PortDescriptionProvider {
@@ -12,9 +12,9 @@ pub trait PortDescriptionProvider {
 			.port_description_list()
 			.iter()
 			.any(|description| match description {
-				crate::PortDescription::In { name, .. }
-				| crate::PortDescription::InOut { name, .. }
-				| crate::PortDescription::Out { name, .. } => *name == port_name,
+				crate::PortDescription::In(inner)
+				| crate::PortDescription::InOut(inner)
+				| crate::PortDescription::Out(inner) => inner.name == port_name,
 			}) {
 			return true;
 		}
@@ -28,9 +28,9 @@ pub trait PortDescriptionProvider {
 		self.port_description_list()
 			.iter()
 			.find(|description| match description {
-				crate::PortDescription::In { name, .. }
-				| crate::PortDescription::InOut { name, .. }
-				| crate::PortDescription::Out { name, .. } => *name == port_name,
+				crate::PortDescription::In(inner)
+				| crate::PortDescription::InOut(inner)
+				| crate::PortDescription::Out(inner) => inner.name == port_name,
 			})
 	}
 
@@ -39,37 +39,68 @@ pub trait PortDescriptionProvider {
 	fn port_description_list(&self) -> &[PortDescription];
 }
 
-/// PortDescription.
+/// Inner data structure for the enum [`PortDescription`].
+pub struct PortDescriptionData {
+	/// Stringified type of the port, created by the port creation macros.
+	type_name: &'static str,
+	/// Identifying name of the port.
+	name: &'static str,
+	/// Optional default value.
+	default: Option<&'static str>,
+	/// Optional comment about the ports purpose.
+	comment: Option<&'static str>,
+}
+
+impl PortDescriptionData {
+	pub const fn new(
+		type_name: &'static str,
+		name: &'static str,
+		default: Option<&'static str>,
+		comment: Option<&'static str>,
+	) -> Self {
+		Self {
+			type_name,
+			name,
+			default,
+			comment,
+		}
+	}
+}
+
+/// Directional PortDescription.
 pub enum PortDescription {
-	In {
-		name: &'static str,
-		description: Option<&'static str>,
-	},
-	InOut {
-		name: &'static str,
-		description: Option<&'static str>,
-	},
-	Out {
-		name: &'static str,
-		description: Option<&'static str>,
-	},
+	In(PortDescriptionData),
+	InOut(PortDescriptionData),
+	Out(PortDescriptionData),
+}
+
+impl Deref for PortDescription {
+	type Target = PortDescriptionData;
+
+	fn deref(&self) -> &Self::Target {
+		match self {
+			crate::PortDescription::In(inner)
+			| crate::PortDescription::InOut(inner)
+			| crate::PortDescription::Out(inner) => inner,
+		}
+	}
 }
 
 impl PortDescription {
-	pub fn description(&self) -> Option<&'static str> {
-		match self {
-			crate::PortDescription::In { description, .. }
-			| crate::PortDescription::InOut { description, .. }
-			| crate::PortDescription::Out { description, .. } => *description,
-		}
+	pub fn comment(&self) -> Option<&'static str> {
+		self.deref().comment
+	}
+
+	pub fn default(&self) -> Option<&'static str> {
+		self.deref().default
 	}
 
 	pub fn name(&self) -> &'static str {
-		match self {
-			crate::PortDescription::In { name, .. }
-			| crate::PortDescription::InOut { name, .. }
-			| crate::PortDescription::Out { name, .. } => name,
-		}
+		self.deref().name
+	}
+
+	pub fn type_name(&self) -> &'static str {
+		self.deref().type_name
 	}
 }
 
@@ -82,6 +113,7 @@ mod tests {
 
 	#[test]
 	const fn normal_types() {
+		is_normal::<&PortDescription>();
 		is_normal::<PortDescription>();
 	}
 }

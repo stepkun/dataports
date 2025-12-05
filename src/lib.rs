@@ -10,7 +10,7 @@ extern crate alloc;
 mod error;
 mod macros;
 //mod port;
-mod port_description;
+pub mod port_description;
 //mod port_provider;
 mod remapping;
 
