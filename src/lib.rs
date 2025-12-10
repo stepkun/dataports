@@ -9,10 +9,7 @@ extern crate alloc;
 
 mod error;
 mod macros;
-//mod port;
 pub mod port_description;
-//mod port_provider;
-mod remapping;
 
 // flatten
 pub use error::Error;

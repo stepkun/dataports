@@ -1,30 +1,19 @@
 // Copyright © 2025 Stephan Kunz
 //! [`dataports`](crate) macro implementations.
-
+/*
 /// Macro for creation of an input only [`PortDescription`](crate::PortDescription).
 #[macro_export]
 macro_rules! input_port_description {
 	($tp:ty, $name:expr $(,)?) => {
-		$crate::PortDescription::In($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::In($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr $(,)?) => {
-		$crate::PortDescription::In($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::In($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr, $comment:expr $(,)?) => {
 		$crate::PortDescription::In($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
 			$name,
 			None,
 			Some($comment),
@@ -36,26 +25,15 @@ macro_rules! input_port_description {
 #[macro_export]
 macro_rules! inout_port_description {
 	($tp:ty, $name:expr $(,)?) => {
-		$crate::PortDescription::InOut($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::InOut($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr $(,)?) => {
-		$crate::PortDescription::InOut($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::InOut($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr, $comment:expr $(,)?) => {
 		$crate::PortDescription::InOut($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
 			$name,
 			None,
 			Some($comment),
@@ -67,26 +45,15 @@ macro_rules! inout_port_description {
 #[macro_export]
 macro_rules! output_port_description {
 	($tp:ty, $name:expr $(,)?) => {
-		$crate::PortDescription::Out($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::Out($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr $(,)?) => {
-		$crate::PortDescription::Out($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
-			$name,
-			None,
-			None,
-		))
+		$crate::PortDescription::Out($crate::port_description::PortDescriptionData::new($name, None, None))
 	};
 
 	($tp:ty, $name:expr, $default:expr, $comment:expr $(,)?) => {
 		$crate::PortDescription::Out($crate::port_description::PortDescriptionData::new(
-			stringify!($tp),
 			$name,
 			None,
 			Some($comment),
@@ -99,15 +66,15 @@ macro_rules! output_port_description {
 macro_rules! port_description_list {
 	($($e:expr),* $(,)?) => {[$($e),*]};
 }
-
-/// Macro for creation of a [`PortDescripptionProvider`](crate::PortDescriptionProvider) implementation.
+*/
+/// Macro for creation of a [`PortDescriptionProvider`](crate::PortDescriptionProvider) implementation.
 #[macro_export]
 macro_rules! port_description_provider {
 	// creation of an empty list
 	($name:ident $(,)?) => {
         static LIST: [$crate::PortDescription; 0] = [];
         impl $crate::PortDescriptionProvider for $name {
-            fn port_description_list(&self) -> &[dataports::PortDescription] {
+            fn port_description_list(&self) -> &[$crate::PortDescription] {
                 &LIST
             }
         }
@@ -117,7 +84,7 @@ macro_rules! port_description_provider {
 	($name:ident, $($e:expr),* $(,)?) => {
         static LIST: [$crate::PortDescription; $crate::_count_elements!($($e),*)] = [$($e),*];
         impl $crate::PortDescriptionProvider for $name {
-            fn port_description_list(&self) -> &[dataports::PortDescription] {
+            fn port_description_list(&self) -> &[$crate::PortDescription] {
                 &LIST
             }
         }

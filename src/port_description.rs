@@ -34,8 +34,6 @@ pub trait PortDescriptionProvider {
 
 /// Inner data structure for the enum [`PortDescription`].
 pub struct PortDescriptionData {
-	/// Stringified type of the port, created by the port creation macros.
-	type_name: &'static str,
 	/// Identifying name of the port.
 	name: &'static str,
 	/// Optional default value.
@@ -45,18 +43,8 @@ pub struct PortDescriptionData {
 }
 
 impl PortDescriptionData {
-	pub const fn new(
-		type_name: &'static str,
-		name: &'static str,
-		default: Option<&'static str>,
-		comment: Option<&'static str>,
-	) -> Self {
-		Self {
-			type_name,
-			name,
-			default,
-			comment,
-		}
+	pub const fn new(name: &'static str, default: Option<&'static str>, comment: Option<&'static str>) -> Self {
+		Self { name, default, comment }
 	}
 }
 
@@ -90,10 +78,6 @@ impl PortDescription {
 
 	pub fn name(&self) -> &'static str {
 		self.deref().name
-	}
-
-	pub fn type_name(&self) -> &'static str {
-		self.deref().type_name
 	}
 }
 

@@ -4,7 +4,7 @@ resolver = "3"
 name = "dataports"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.89.0"
+rust-version = "1.90.0"
 license-file = "LICENSE"
 authors = ["stepkun <stephan.kunz@kabelbw.de>"]
 description = "Port abstractions for data types"
@@ -17,6 +17,7 @@ categories = ["development-tools"]
 exclude = ["laze*", "benches/**", "embedded/**", "examples/**", "tests/**"]
 
 [dependencies]
+paste = "1"
 
 [dev-dependencies]
 doc-comment = "0.3.4"
