@@ -2,7 +2,7 @@
 [package]
 resolver = "3"
 name = "dataports"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2024"
 rust-version = "1.90.0"
 license-file = "LICENSE"
@@ -17,7 +17,16 @@ categories = ["development-tools"]
 exclude = ["laze*", "benches/**", "embedded/**", "examples/**", "tests/**"]
 
 [dependencies]
-paste = "1"
+spin = { version = "0.10.0", default-features = false, features = [
+    #"fair_mutex",
+    "portable-atomic",
+    "rwlock",
+    "use_ticket_mutex",
+] }
 
 [dev-dependencies]
 doc-comment = "0.3.4"
+
+[features]
+default = ["std"]
+std = ["spin/std"]

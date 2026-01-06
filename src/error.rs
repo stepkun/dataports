@@ -1,11 +1,25 @@
-// Copyright © 2025 Stephan Kunz
-//! [`dataports`](crate) errors.
+// Copyright © 2026 Stephan Kunz
+//! Error implementation.
 
-#![allow(clippy::match_single_binding)]
+use crate::ConstString;
+
+/// Shortcut for [`dataport`](crate)'s Result<T, E> type
+pub(crate) type Result<T> = core::result::Result<T, Error>;
 
 /// Port errors.
 #[non_exhaustive]
-pub enum Error {}
+pub(crate) enum Error {
+	/// Ports value is currently locked.
+	IsLocked {
+		/// Name of the port.
+		port: ConstString,
+	},
+	/// No value set for a port.
+	NoValueSet {
+		/// Name of the port.
+		port: ConstString,
+	},
+}
 
 /// Only default implementation needed.
 impl core::error::Error for Error {}
@@ -13,7 +27,8 @@ impl core::error::Error for Error {}
 impl core::fmt::Debug for Error {
 	fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 		match self {
-			_ => write!(f, "Unknown"),
+			Self::IsLocked { port } => write!(f, "IsLocked(port: {port})"),
+			Self::NoValueSet { port } => write!(f, "NoValueSet(port: {port})"),
 		}
 	}
 }
@@ -21,7 +36,8 @@ impl core::fmt::Debug for Error {
 impl core::fmt::Display for Error {
 	fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 		match self {
-			_ => write!(f, "Unknown error in crate [dataports]"),
+			Self::IsLocked { port } => write!(f, "port '{port}' is currently locked"),
+			Self::NoValueSet { port } => write!(f, "no value set for port '{port}'"),
 		}
 	}
 }
