@@ -1,17 +1,22 @@
 // Copyright © 2026 Stephan Kunz
 //! A bound input type port implementing [`BindIn`].
 
-use alloc::boxed::Box;
+use alloc::{boxed::Box, sync::Arc};
+use spin::RwLock;
 
-use crate::bind::{BindCommons, BindIn, any_port_value::AnyPortValueType, port_value::PortValue};
+use crate::bind::{
+	BindCommons, BindIn,
+	any_port_value::AnyPortValueType,
+	port_value::{PortValue, PortValuePtr},
+};
 
 /// @TODO:
 #[derive(Debug)]
-pub struct BoundInPort(Box<dyn AnyPortValueType>);
+pub struct BoundInPort(PortValuePtr);
 
 impl BoundInPort {
 	pub fn new<T: AnyPortValueType>(value: T) -> Self {
-		Self(Box::new(PortValue::<T>::new(value)))
+		Self(Arc::new(RwLock::new(PortValue::<T>::new(value))))
 	}
 }
 

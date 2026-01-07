@@ -1,17 +1,22 @@
 // Copyright © 2026 Stephan Kunz
 //! A bound output type port implementing [`BindOut`].
 
-use alloc::boxed::Box;
+use alloc::{boxed::Box, sync::Arc};
+use spin::RwLock;
 
-use crate::bind::{BindCommons, BindOut, any_port_value::AnyPortValueType, port_value::PortValue};
+use crate::bind::{
+	BindCommons, BindOut,
+	any_port_value::AnyPortValueType,
+	port_value::{PortValue, PortValuePtr},
+};
 
 /// @TODO:
 #[derive(Debug)]
-pub struct BoundOutPort(Box<dyn AnyPortValueType>);
+pub struct BoundOutPort(PortValuePtr);
 
 impl BoundOutPort {
 	pub fn new<T: AnyPortValueType>(value: T) -> Self {
-		Self(Box::new(PortValue::<T>::new(value)))
+		Self(Arc::new(RwLock::new(PortValue::<T>::new(value))))
 	}
 }
 

@@ -19,6 +19,11 @@ pub(crate) enum Error {
 		/// Name of the port.
 		port: ConstString,
 	},
+	/// Port has other data type then exoected.
+	WrongDataType {
+		/// Name of the port.
+		port: ConstString,
+	},
 }
 
 /// Only default implementation needed.
@@ -29,6 +34,7 @@ impl core::fmt::Debug for Error {
 		match self {
 			Self::IsLocked { port } => write!(f, "IsLocked(port: {port})"),
 			Self::NoValueSet { port } => write!(f, "NoValueSet(port: {port})"),
+			Self::WrongDataType { port } => write!(f, "WrongDataType(port: {port})"),
 		}
 	}
 }
@@ -38,6 +44,7 @@ impl core::fmt::Display for Error {
 		match self {
 			Self::IsLocked { port } => write!(f, "port '{port}' is currently locked"),
 			Self::NoValueSet { port } => write!(f, "no value set for port '{port}'"),
+			Self::WrongDataType { port } => write!(f, "port '{port}' has a different data type then expected"),
 		}
 	}
 }

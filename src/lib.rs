@@ -9,6 +9,8 @@ doc_comment::doctest!("../README.md");
 
 extern crate alloc;
 
+use core::any::Any;
+
 use alloc::sync::Arc;
 
 // internal re-export for easy changeability
@@ -40,4 +42,22 @@ type ConstString = Arc<str>;
 
 trait PortCommons {
 	fn name(&self) -> ConstString;
+}
+
+trait AnySendSync: Any + Send + Sync {
+	fn as_any(&self) -> &dyn Any;
+
+	fn as_mut_any(&mut self) -> &mut dyn Any;
+}
+
+/// Blanket implementation for any type that implements
+/// [`Any`], [`Send`] and [`Sync`].
+impl<T: Any + Send + Sync> AnySendSync for T {
+	fn as_any(&self) -> &dyn Any {
+		self
+	}
+
+	fn as_mut_any(&mut self) -> &mut dyn Any {
+		self
+	}
 }

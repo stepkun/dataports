@@ -17,7 +17,7 @@ use crate::{
 };
 
 /// Type definition for a pointer to a [`PortValue`]
-pub(crate) type PortValuePtr<T> = Arc<RwLock<PortValue<T>>>;
+pub(crate) type PortValuePtr = Arc<RwLock<dyn AnyPortValueType>>;
 
 /// Internal representation of a ports value.
 /// The `PortValue` is shared between the bound ports.
@@ -62,15 +62,6 @@ impl<T> PortValue<T> {
 	}
 }
 
-impl<T: 'static + Send + Sync + core::fmt::Debug> AnyPortValueType for PortValue<T> {
-	fn as_any(&self) -> &dyn Any {
-		self
-	}
-	fn as_mut_any(&mut self) -> &mut dyn Any {
-		self
-	}
-}
-
 impl<T: Clone> PortValue<T> {
 	pub(crate) fn get(&self) -> Option<T> {
 		self.0.clone()
@@ -99,7 +90,7 @@ impl<T: Default> Default for PortValue<T> {
 #[must_use = "a `PortValueReadGuard` should be used"]
 pub(crate) struct PortValueReadGuard<T> {
 	/// `Arc` to a `value`
-	value: PortValuePtr<T>,
+	value: PortValuePtr,
 	/// Immutable pointer to content of the `value` above
 	ptr_t: *const T,
 }
@@ -124,21 +115,25 @@ impl<T> Drop for PortValueReadGuard<T> {
 	}
 }
 
-impl<T> PortValueReadGuard<T> {
+impl<T: 'static> PortValueReadGuard<T> {
 	/// Returns a read guard to a T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr<T>) -> Result<Self> {
+	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			let guard = value.read();
 			// leak returns &'rwlock &Option<T> but read locks RwLock forewer
 			let x = RwLockReadGuard::leak(guard);
-			if let Some(value) = &x.0 {
-				let ptr_t: *const T = value;
-				ptr_t
+			if let Some(v) = x.as_any().downcast_ref::<PortValue<T>>() {
+				if let Some(value) = &v.0 {
+					let ptr_t: *const T = value;
+					ptr_t
+				} else {
+					return Err(Error::NoValueSet { port: port.into() });
+				}
 			} else {
-				return Err(Error::NoValueSet { port: port.into() });
+				return Err(Error::WrongDataType { port: port.into() });
 			}
 		};
 
@@ -149,17 +144,21 @@ impl<T> PortValueReadGuard<T> {
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr<T>) -> Result<Self> {
+	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			if let Some(guard) = value.try_read() {
 				// leak returns &'rwlock &Option<T> but read locks RwLock forewer
 				let x = RwLockReadGuard::leak(guard);
-				if let Some(value) = &x.0 {
-					let ptr_t: *const T = value;
-					ptr_t
+				if let Some(v) = x.as_any().downcast_ref::<PortValue<T>>() {
+					if let Some(value) = &v.0 {
+						let ptr_t: *const T = value;
+						ptr_t
+					} else {
+						return Err(Error::NoValueSet { port: port.into() });
+					}
 				} else {
-					return Err(Error::NoValueSet { port: port.into() });
+					return Err(Error::WrongDataType { port: port.into() });
 				}
 			} else {
 				return Err(Error::IsLocked { port: port.into() });
@@ -177,7 +176,7 @@ impl<T> PortValueReadGuard<T> {
 #[must_use = "a `PortValueWriteGuard` should be used"]
 pub(crate) struct PortValueWriteGuard<T> {
 	/// `Arc` to a `value`.
-	value: PortValuePtr<T>,
+	value: PortValuePtr,
 	/// Mutable pointer to content of the `value` above.
 	ptr_t: *mut T,
 	/// Mutable pointer to the sequence_id.
@@ -221,22 +220,26 @@ impl<T> Drop for PortValueWriteGuard<T> {
 	}
 }
 
-impl<T> PortValueWriteGuard<T> {
+impl<T: 'static> PortValueWriteGuard<T> {
 	/// Returns a write guard to a T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr<T>) -> Result<Self> {
+	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			let guard = value.write();
 			// leak returns &'rwlock &Option<T> but write locks RwLock forewer
 			let x = RwLockWriteGuard::leak(guard);
-			if let Some(value) = &mut x.0 {
-				let ptr_t: *mut T = value;
-				let ptr_seq_id: *mut SequenceNumber = &raw mut x.1;
-				(ptr_t, ptr_seq_id)
+			if let Some(v) = x.as_mut_any().downcast_mut::<PortValue<T>>() {
+				if let Some(value) = &mut v.0 {
+					let ptr_t: *mut T = value;
+					let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
+					(ptr_t, ptr_seq_id)
+				} else {
+					return Err(Error::NoValueSet { port: port.into() });
+				}
 			} else {
-				return Err(Error::NoValueSet { port: port.into() });
+				return Err(Error::WrongDataType { port: port.into() });
 			}
 		};
 
@@ -252,18 +255,22 @@ impl<T> PortValueWriteGuard<T> {
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr<T>) -> Result<Self> {
+	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			if let Some(guard) = value.try_write() {
 				// leak returns &'rwlock &Option<T> but write locks RwLock forewer
 				let x = RwLockWriteGuard::leak(guard);
-				if let Some(value) = &mut x.0 {
-					let ptr_t: *mut T = value;
-					let ptr_seq_id: *mut SequenceNumber = &raw mut x.1;
-					(ptr_t, ptr_seq_id)
+				if let Some(v) = x.as_mut_any().downcast_mut::<PortValue<T>>() {
+					if let Some(value) = &mut v.0 {
+						let ptr_t: *mut T = value;
+						let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
+						(ptr_t, ptr_seq_id)
+					} else {
+						return Err(Error::NoValueSet { port: port.into() });
+					}
 				} else {
-					return Err(Error::NoValueSet { port: port.into() });
+					return Err(Error::WrongDataType { port: port.into() });
 				}
 			} else {
 				return Err(Error::IsLocked { port: port.into() });
