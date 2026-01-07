@@ -1,13 +1,15 @@
 // Copyright © 2026 Stephan Kunz
 //! A bound input type port implementing [`BindIn`].
 
+use core::any::Any;
+
 use alloc::{boxed::Box, sync::Arc};
 use spin::RwLock;
 
 use crate::bind::{
 	BindCommons, BindIn,
 	any_port_value::AnyPortValueType,
-	port_value::{PortValue, PortValuePtr},
+	port_value::{PortValue, PortValuePtr, PortValueReadGuard},
 };
 
 /// @TODO:
@@ -22,26 +24,31 @@ impl BoundInPort {
 
 impl BindCommons for BoundInPort {}
 
-impl BindIn for BoundInPort {
-	fn get<T>(&self) -> Option<T>
+impl<T: AnyPortValueType> BindIn<T> for BoundInPort {
+	fn get(&self) -> Option<T>
 	where
 		T: Clone,
 	{
-		todo!()
+		let any_value = &*self.0.read();
+		if let Some(t_ref) = any_value.as_any().downcast_ref::<PortValue<T>>() {
+			t_ref.get()
+		} else {
+			None
+		}
 	}
 
-	fn read<T>(&self) -> crate::error::Result<super::port_value::PortValueReadGuard<T>> {
-		todo!()
+	fn read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+		PortValueReadGuard::new(self.0.clone())
 	}
 
-	fn try_read<T>(&self) -> crate::error::Result<super::port_value::PortValueReadGuard<T>> {
-		todo!()
+	fn try_read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+		PortValueReadGuard::try_new(self.0.clone())
 	}
 }
 
 impl Clone for BoundInPort {
 	fn clone(&self) -> Self {
-		todo!()
+		BoundInPort(self.0.clone())
 	}
 }
 

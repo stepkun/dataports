@@ -20,14 +20,13 @@ use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 pub use bind::in_out_port::BoundInOutPort;
 pub use bind::in_port::BoundInPort;
 pub use bind::out_port::BoundOutPort;
+pub use bind::port_value::{PortValueReadGuard, PortValueWriteGuard};
+pub use bind::{BindIn, BindInOut, BindOut};
 pub use collections::port_array::PortArray;
 pub use flow::in_out_port::FlowingInOutPort;
 pub use flow::in_port::FlowingInPort;
 pub use flow::out_port::FlowingOutPort;
 pub use port::Port;
-
-use crate::bind::BindIn;
-
 // internal module structure
 mod any_port;
 mod bind;

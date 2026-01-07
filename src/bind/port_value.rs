@@ -24,10 +24,10 @@ pub(crate) type PortValuePtr = Arc<RwLock<dyn AnyPortValueType>>;
 pub(crate) struct PortValue<T>(Option<T>, SequenceNumber);
 
 impl<T> PortValue<T> {
-	pub(crate) fn new(value: impl Into<T>) -> Self {
+	pub(crate) fn new(value: T) -> Self {
 		let mut sq = SequenceNumber::default();
 		sq.increment();
-		Self(Some(value.into()), sq)
+		Self(Some(value), sq)
 	}
 
 	pub(crate) const fn as_ref(&self) -> Option<&T> {
@@ -42,18 +42,18 @@ impl<T> PortValue<T> {
 		self.0.is_none()
 	}
 
-	pub(crate) fn replace(&mut self, value: impl Into<T>) -> Option<T> {
+	pub(crate) fn replace(&mut self, value: T) -> Option<T> {
 		self.1.increment();
-		self.0.replace(value.into())
+		self.0.replace(value)
 	}
 
 	pub(crate) const fn sequence_number(&self) -> u32 {
 		self.1.value()
 	}
 
-	pub(crate) fn set(&mut self, value: impl Into<T>) {
+	pub(crate) fn set(&mut self, value: T) {
 		self.1.increment();
-		self.0 = Some(value.into())
+		self.0 = Some(value)
 	}
 
 	pub(crate) fn take(&mut self) -> Option<T> {
@@ -88,7 +88,7 @@ impl<T: Default> Default for PortValue<T> {
 ///
 /// Implements [`Deref`], providing read access to the locked `T`.
 #[must_use = "a `PortValueReadGuard` should be used"]
-pub(crate) struct PortValueReadGuard<T> {
+pub struct PortValueReadGuard<T> {
 	/// `Arc` to a `value`
 	value: PortValuePtr,
 	/// Immutable pointer to content of the `value` above
@@ -119,7 +119,7 @@ impl<T: 'static> PortValueReadGuard<T> {
 	/// Returns a read guard to a T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
+	pub(crate) fn new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			let guard = value.read();
@@ -130,10 +130,10 @@ impl<T: 'static> PortValueReadGuard<T> {
 					let ptr_t: *const T = value;
 					ptr_t
 				} else {
-					return Err(Error::NoValueSet { port: port.into() });
+					return Err(Error::NoValueSet);
 				}
 			} else {
-				return Err(Error::WrongDataType { port: port.into() });
+				return Err(Error::WrongDataType);
 			}
 		};
 
@@ -144,7 +144,7 @@ impl<T: 'static> PortValueReadGuard<T> {
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
+	pub(crate) fn try_new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			if let Some(guard) = value.try_read() {
@@ -155,13 +155,13 @@ impl<T: 'static> PortValueReadGuard<T> {
 						let ptr_t: *const T = value;
 						ptr_t
 					} else {
-						return Err(Error::NoValueSet { port: port.into() });
+						return Err(Error::NoValueSet);
 					}
 				} else {
-					return Err(Error::WrongDataType { port: port.into() });
+					return Err(Error::WrongDataType);
 				}
 			} else {
-				return Err(Error::IsLocked { port: port.into() });
+				return Err(Error::IsLocked);
 			}
 		};
 
@@ -174,7 +174,7 @@ impl<T: 'static> PortValueReadGuard<T> {
 ///
 /// Implements [`Deref`] & [`DerefMut`], providing access to the locked `T`.
 #[must_use = "a `PortValueWriteGuard` should be used"]
-pub(crate) struct PortValueWriteGuard<T> {
+pub struct PortValueWriteGuard<T> {
 	/// `Arc` to a `value`.
 	value: PortValuePtr,
 	/// Mutable pointer to content of the `value` above.
@@ -224,7 +224,7 @@ impl<T: 'static> PortValueWriteGuard<T> {
 	/// Returns a write guard to a T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
+	pub(crate) fn new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			let guard = value.write();
@@ -236,10 +236,10 @@ impl<T: 'static> PortValueWriteGuard<T> {
 					let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
 					(ptr_t, ptr_seq_id)
 				} else {
-					return Err(Error::NoValueSet { port: port.into() });
+					return Err(Error::NoValueSet);
 				}
 			} else {
-				return Err(Error::WrongDataType { port: port.into() });
+				return Err(Error::WrongDataType);
 			}
 		};
 
@@ -255,7 +255,7 @@ impl<T: 'static> PortValueWriteGuard<T> {
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
-	pub(crate) fn try_new(port: impl Into<ConstString>, value: PortValuePtr) -> Result<Self> {
+	pub(crate) fn try_new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			if let Some(guard) = value.try_write() {
@@ -267,13 +267,13 @@ impl<T: 'static> PortValueWriteGuard<T> {
 						let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
 						(ptr_t, ptr_seq_id)
 					} else {
-						return Err(Error::NoValueSet { port: port.into() });
+						return Err(Error::NoValueSet);
 					}
 				} else {
-					return Err(Error::WrongDataType { port: port.into() });
+					return Err(Error::WrongDataType);
 				}
 			} else {
-				return Err(Error::IsLocked { port: port.into() });
+				return Err(Error::IsLocked);
 			}
 		};
 

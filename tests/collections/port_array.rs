@@ -35,7 +35,7 @@ fn bound() {
 		String::from("2"),
 		String::from("3")
 	]);
-	let array = creation_bind!(vec![vec![1, 2, 3], vec![4, 5, 6]]);
+	let array = creation_bind!(vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }
 
 macro_rules! creation_flow {
