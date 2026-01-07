@@ -6,10 +6,15 @@ use core::any::Any;
 use alloc::{boxed::Box, sync::Arc};
 use spin::RwLock;
 
-use crate::bind::{
-	BindCommons, BindIn,
-	any_port_value::AnyPortValueType,
-	port_value::{PortValue, PortValuePtr, PortValueReadGuard},
+use crate::{
+	bind::{
+		BindCommons, BindIn,
+		any_port_value::AnyPortValueType,
+		in_out_port::BoundInOutPort,
+		out_port::BoundOutPort,
+		port_value::{PortValue, PortValuePtr, PortValueReadGuard},
+	},
+	error::{Error, Result},
 };
 
 /// @TODO:
@@ -17,12 +22,43 @@ use crate::bind::{
 pub struct BoundInPort(PortValuePtr);
 
 impl BoundInPort {
+	pub fn empty<T: AnyPortValueType>() -> Self {
+		Self(Arc::new(RwLock::new(PortValue::<T>::empty())))
+	}
+
 	pub fn new<T: AnyPortValueType>(value: T) -> Self {
 		Self(Arc::new(RwLock::new(PortValue::<T>::new(value))))
 	}
+
+	pub(crate) fn set_value(&mut self, value: PortValuePtr) -> Result<()> {
+		let x = (*self.0.read()).type_id();
+		let y = (*value.read()).type_id();
+		if x == y {
+			self.0 = value;
+			Ok(())
+		} else {
+			Err(Error::WrongDataType)
+		}
+	}
+
+	pub(crate) fn value(&self) -> PortValuePtr {
+		self.0.clone()
+	}
 }
 
-impl BindCommons for BoundInPort {}
+impl BindCommons for BoundInPort {
+	fn bind(&mut self, other: &dyn crate::any_port::AnyPortType) -> crate::error::Result<()> {
+		if let Some(port) = other.as_any().downcast_ref::<BoundInPort>() {
+			self.set_value(port.value())
+		} else if let Some(port) = other.as_any().downcast_ref::<BoundOutPort>() {
+			self.set_value(port.value())
+		} else if let Some(port) = other.as_any().downcast_ref::<BoundInOutPort>() {
+			self.set_value(port.value())
+		} else {
+			todo!("missing implementation for new port type")
+		}
+	}
+}
 
 impl<T: AnyPortValueType> BindIn<T> for BoundInPort {
 	fn get(&self) -> Option<T>

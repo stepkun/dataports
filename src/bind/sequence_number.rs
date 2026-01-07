@@ -43,7 +43,7 @@ mod tests {
 	}
 
 	#[test]
-	fn methods() {
+	fn internal_methods() {
 		let mut sq = SequenceNumber::default();
 		assert_eq!(sq.0, 0);
 		sq.increment();

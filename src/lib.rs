@@ -21,12 +21,13 @@ pub use bind::in_out_port::BoundInOutPort;
 pub use bind::in_port::BoundInPort;
 pub use bind::out_port::BoundOutPort;
 pub use bind::port_value::{PortValueReadGuard, PortValueWriteGuard};
-pub use bind::{BindIn, BindInOut, BindOut};
+pub use bind::{BindCommons, BindIn, BindInOut, BindOut};
 pub use collections::port_array::PortArray;
 pub use flow::in_out_port::FlowingInOutPort;
 pub use flow::in_port::FlowingInPort;
 pub use flow::out_port::FlowingOutPort;
 pub use port::Port;
+
 // internal module structure
 mod any_port;
 mod bind;
@@ -43,20 +44,20 @@ trait PortCommons {
 	fn name(&self) -> ConstString;
 }
 
-trait AnySendSync: Any + Send + Sync {
-	fn as_any(&self) -> &dyn Any;
-
-	fn as_mut_any(&mut self) -> &mut dyn Any;
-}
-
-/// Blanket implementation for any type that implements
-/// [`Any`], [`Send`] and [`Sync`].
-impl<T: Any + Send + Sync> AnySendSync for T {
-	fn as_any(&self) -> &dyn Any {
-		self
-	}
-
-	fn as_mut_any(&mut self) -> &mut dyn Any {
-		self
-	}
-}
+// trait AnySendSync: Any + Send + Sync {
+// 	fn as_any(&self) -> &dyn Any;
+//
+// 	fn as_mut_any(&mut self) -> &mut dyn Any;
+// }
+//
+// /// Blanket implementation for any type that implements
+// /// [`Any`], [`Send`] and [`Sync`].
+// impl<T: Any + Send + Sync> AnySendSync for T {
+// 	fn as_any(&self) -> &dyn Any {
+// 		self
+// 	}
+//
+// 	fn as_mut_any(&mut self) -> &mut dyn Any {
+// 		self
+// 	}
+// }

@@ -24,6 +24,11 @@ pub(crate) type PortValuePtr = Arc<RwLock<dyn AnyPortValueType>>;
 pub(crate) struct PortValue<T>(Option<T>, SequenceNumber);
 
 impl<T> PortValue<T> {
+	pub(crate) fn empty() -> Self {
+		let mut sq = SequenceNumber::default();
+		Self(None, sq)
+	}
+
 	pub(crate) fn new(value: T) -> Self {
 		let mut sq = SequenceNumber::default();
 		sq.increment();
