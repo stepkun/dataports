@@ -10,7 +10,6 @@ use alloc::boxed::Box;
 use crate::{
 	ConstString, PortCommons,
 	bind::{in_out_port::BoundInOutPort, in_port::BoundInPort, out_port::BoundOutPort},
-	flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort},
 };
 
 /// The `AnyPortType` trait allows to use different types of ports in collections.
@@ -38,4 +37,3 @@ macro_rules! implement_any_port_type {
 }
 
 implement_any_port_type!(BoundInOutPort, BoundInPort, BoundOutPort);
-implement_any_port_type!(FlowingInOutPort, FlowingInPort, FlowingOutPort);

@@ -14,7 +14,6 @@ use crate::{
 		BindCommons, BindIn, BindInOut, BindOut, in_out_port::BoundInOutPort, in_port::BoundInPort, out_port::BoundOutPort,
 	},
 	error::Result,
-	flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort},
 };
 
 /// A type erased port.
@@ -49,16 +48,6 @@ impl Clone for Port {
 			} else if let Some(port) = self.ty.as_any().downcast_ref::<BoundOutPort>() {
 				Box::new(port.clone())
 			} else if let Some(port) = self.ty.as_any().downcast_ref::<BoundInOutPort>() {
-				Box::new(port.clone())
-			} else if let Some(port) = self.ty.as_any().downcast_ref::<FlowingInPort>() {
-				Box::new(port.clone())
-			} else if let Some(port) = self.ty.as_any().downcast_ref::<FlowingOutPort>() {
-				Box::new(port.clone())
-			} else if let Some(port) = self
-				.ty
-				.as_any()
-				.downcast_ref::<FlowingInOutPort>()
-			{
 				Box::new(port.clone())
 			} else {
 				todo!("missing implementation for new port type")
