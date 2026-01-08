@@ -3,7 +3,13 @@
 
 #![allow(unused)]
 
-use crate::port::Port;
+use crate::{
+	PortCommons,
+	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
+	collections::PortProvider,
+	error::Result,
+	port::Port,
+};
 
 /// A fixed unsorted array of [`Port`]s.
 #[repr(transparent)]
@@ -26,6 +32,22 @@ impl<const S: usize> core::ops::Deref for PortArray<S> {
 
 	fn deref(&self) -> &Self::Target {
 		&self.0
+	}
+}
+
+impl<const S: usize> PortProvider for PortArray<S> {
+	fn find(&self, name: &str) -> Option<&Port> {
+		self.0
+			.iter()
+			.find(|port| &*port.name() == name)
+			.map(|v| v as _)
+	}
+
+	fn find_mut(&mut self, name: &str) -> Option<&mut Port> {
+		self.0
+			.iter_mut()
+			.find(|port| &*port.name() == name)
+			.map(|v| v as _)
 	}
 }
 

@@ -8,8 +8,13 @@ use core::any::Any;
 use alloc::boxed::Box;
 
 use crate::{
-	BoundInOutPort, BoundOutPort, ConstString, FlowingInOutPort, FlowingInPort, FlowingOutPort, PortCommons,
-	any_port::AnyPortType, bind::in_port::BoundInPort,
+	ConstString, PortCommons,
+	any_port::AnyPortType,
+	bind::{
+		BindCommons, BindIn, BindInOut, BindOut, in_out_port::BoundInOutPort, in_port::BoundInPort, out_port::BoundOutPort,
+	},
+	error::Result,
+	flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort},
 };
 
 /// A type erased port.
@@ -69,6 +74,52 @@ impl Clone for Port {
 impl PortCommons for Port {
 	fn name(&self) -> ConstString {
 		self.name.clone()
+	}
+}
+
+impl BindCommons for Port {
+	fn bind_to(&mut self, other: &dyn AnyPortType) -> Result<()> {
+		todo!()
+	}
+}
+
+impl<T> BindIn<T> for Port {
+	fn get(&self) -> Option<T>
+	where
+		T: Clone,
+	{
+		todo!()
+	}
+
+	fn read(&self) -> crate::error::Result<crate::PortValueReadGuard<T>> {
+		todo!()
+	}
+
+	fn try_read(&self) -> crate::error::Result<crate::PortValueReadGuard<T>> {
+		todo!()
+	}
+}
+impl<T> BindInOut<T> for Port {
+	fn replace(&mut self, value: T) -> Option<T> {
+		todo!()
+	}
+
+	fn take(&mut self) -> Option<T> {
+		todo!()
+	}
+}
+
+impl<T> BindOut<T> for Port {
+	fn set(&mut self, value: T) -> Result<()> {
+		todo!()
+	}
+
+	fn write(&mut self) -> Result<crate::PortValueWriteGuard<T>> {
+		todo!()
+	}
+
+	fn try_write(&mut self) -> Result<crate::PortValueWriteGuard<T>> {
+		todo!()
 	}
 }
 

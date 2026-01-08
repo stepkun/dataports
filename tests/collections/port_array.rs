@@ -7,11 +7,9 @@
 
 use core::f64::consts::PI;
 
-use dataports::{
-	BoundInOutPort, BoundInPort, BoundOutPort, FlowingInOutPort, FlowingInPort, FlowingOutPort, Port, PortArray,
-};
+use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortArray};
 
-macro_rules! creation_bind {
+macro_rules! test_creation {
 	($value: expr) => {
 		PortArray::new([
 			Port::new("inbound", BoundInPort::new($value)),
@@ -23,32 +21,17 @@ macro_rules! creation_bind {
 
 #[test]
 fn bound() {
-	let array = creation_bind!(true);
-	let array = creation_bind!(42);
-	let array = creation_bind!(PI);
-	let array = creation_bind!("str");
-	let array = creation_bind!(String::from("string"));
-	let array = creation_bind!(vec![1, 2, 3]);
-	let array = creation_bind!(vec!["1", "2", "3"]);
-	let array = creation_bind!(vec![
+	let array = test_creation!(true);
+	let array = test_creation!(42);
+	let array = test_creation!(PI);
+	let array = test_creation!("str");
+	let array = test_creation!(String::from("string"));
+	let array = test_creation!(vec![1, 2, 3]);
+	let array = test_creation!(vec!["1", "2", "3"]);
+	let array = test_creation!(vec![
 		String::from("1"),
 		String::from("2"),
 		String::from("3")
 	]);
-	let array = creation_bind!(vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
-}
-
-macro_rules! creation_flow {
-	($value: expr) => {
-		PortArray::new([
-			Port::new("inflow", FlowingInPort::new($value)),
-			Port::new("outflow", FlowingOutPort::new($value)),
-			Port::new("inoutflow", FlowingInOutPort::new($value)),
-		])
-	};
-}
-
-#[test]
-fn flowing() {
-	let array = creation_flow!(42);
+	let array = test_creation!(vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }

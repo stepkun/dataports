@@ -5,12 +5,34 @@
 
 use alloc::vec::Vec;
 
-use crate::port::Port;
+use crate::{
+	PortCommons,
+	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
+	collections::PortProvider,
+	error::Result,
+	port::Port,
+};
 
 /// An extendable unsorted list of [`Port`]s.
 #[derive(Default)]
 #[repr(transparent)]
-struct PortList(Vec<Port>);
+pub struct PortList(Vec<Port>);
+
+impl PortProvider for PortList {
+	fn find(&self, name: &str) -> Option<&Port> {
+		self.0
+			.iter()
+			.find(|port| &*port.name() == name)
+			.map(|v| v as _)
+	}
+
+	fn find_mut(&mut self, name: &str) -> Option<&mut Port> {
+		self.0
+			.iter_mut()
+			.find(|port| &*port.name() == name)
+			.map(|v| v as _)
+	}
+}
 
 #[cfg(test)]
 mod tests {

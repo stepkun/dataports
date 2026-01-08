@@ -21,7 +21,8 @@ use crate::{
 
 /// Trait for bind port types.
 pub trait BindCommons {
-	fn bind(&mut self, other: &dyn AnyPortType) -> Result<()>;
+	/// Binds port to another port.
+	fn bind_to(&mut self, other: &dyn AnyPortType) -> Result<()>;
 }
 
 /// Trait for incoming bind port types.

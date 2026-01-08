@@ -47,7 +47,7 @@ impl BoundInPort {
 }
 
 impl BindCommons for BoundInPort {
-	fn bind(&mut self, other: &dyn crate::any_port::AnyPortType) -> crate::error::Result<()> {
+	fn bind_to(&mut self, other: &dyn crate::any_port::AnyPortType) -> crate::error::Result<()> {
 		if let Some(port) = other.as_any().downcast_ref::<BoundInPort>() {
 			self.set_value(port.value())
 		} else if let Some(port) = other.as_any().downcast_ref::<BoundOutPort>() {

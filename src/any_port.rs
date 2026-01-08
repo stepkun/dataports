@@ -8,8 +8,9 @@ use core::any::Any;
 use alloc::boxed::Box;
 
 use crate::{
-	BoundInOutPort, BoundOutPort, ConstString, FlowingInOutPort, FlowingInPort, FlowingOutPort, PortCommons,
-	bind::in_port::BoundInPort,
+	ConstString, PortCommons,
+	bind::{in_out_port::BoundInOutPort, in_port::BoundInPort, out_port::BoundOutPort},
+	flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort},
 };
 
 /// The `AnyPortType` trait allows to use different types of ports in collections.

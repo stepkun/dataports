@@ -15,12 +15,12 @@ macro_rules! test_binding {
 		let mut iop = BoundInOutPort::empty::<$tp>();
 		let mut ip = BoundInPort::empty::<$tp>();
 
-		assert!(iop.bind(&op).is_ok());
-		assert!(op.bind(&iop).is_ok());
-		assert!(op.bind(&ip).is_ok());
-		assert!(iop.bind(&ip).is_ok());
-		assert!(ip.bind(&iop).is_ok());
-		assert!(ip.bind(&op).is_ok());
+		assert!(iop.bind_to(&op).is_ok());
+		assert!(op.bind_to(&iop).is_ok());
+		assert!(op.bind_to(&ip).is_ok());
+		assert!(iop.bind_to(&ip).is_ok());
+		assert!(ip.bind_to(&iop).is_ok());
+		assert!(ip.bind_to(&op).is_ok());
 
 		assert!(op.set($value).is_ok());
 		assert_eq!(iop.get(), Some($value));
