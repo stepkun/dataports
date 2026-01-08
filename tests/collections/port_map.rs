@@ -46,15 +46,15 @@ macro_rules! test_creation {
 }
 
 #[test]
-fn list_creation() {
-	let list = test_creation!(bool, true);
-	let list = test_creation!(i32, 42);
-	let list = test_creation!(f64, PI);
-	let list = test_creation!(&str, "str");
-	let list = test_creation!(String, String::from("string"));
-	let list = test_creation!(Vec<i32>, vec![1, 2, 3]);
-	let list = test_creation!(Vec<&str>, vec!["1", "2", "3"]);
-	let list = test_creation!(
+fn map_creation() {
+	let map = test_creation!(bool, true);
+	let map = test_creation!(i32, 42);
+	let map = test_creation!(f64, PI);
+	let map = test_creation!(&str, "str");
+	let map = test_creation!(String, String::from("string"));
+	let map = test_creation!(Vec<i32>, vec![1, 2, 3]);
+	let map = test_creation!(Vec<&str>, vec!["1", "2", "3"]);
+	let map = test_creation!(
 		Vec<String>,
 		vec![
 			String::from("1"),
@@ -62,5 +62,5 @@ fn list_creation() {
 			String::from("3")
 		]
 	);
-	let array = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
+	let map = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }

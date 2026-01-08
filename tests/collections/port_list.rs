@@ -62,5 +62,5 @@ fn list_creation() {
 			String::from("3")
 		]
 	);
-	let array = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
+	let list = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }
