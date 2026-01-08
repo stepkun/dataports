@@ -11,9 +11,9 @@ use dataports::{BindCommons, BindIn, BindInOut, BindOut, BoundInOutPort, BoundIn
 
 macro_rules! test_binding {
 	($tp:ty, $value:expr) => {
-		let mut op = BoundOutPort::empty::<$tp>();
-		let mut iop = BoundInOutPort::empty::<$tp>();
-		let mut ip = BoundInPort::empty::<$tp>();
+		let mut op = BoundOutPort::new::<$tp>();
+		let mut iop = BoundInOutPort::new::<$tp>();
+		let mut ip = BoundInPort::new::<$tp>();
 
 		assert!(iop.bind_to(&op).is_ok());
 		assert!(op.bind_to(&iop).is_ok());

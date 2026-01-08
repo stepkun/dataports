@@ -12,15 +12,15 @@ use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortArray};
 macro_rules! test_creation {
 	($value: expr) => {
 		PortArray::new([
-			Port::new("inbound", BoundInPort::new($value)),
-			Port::new("outbound", BoundOutPort::new($value)),
-			Port::new("inoutbound", BoundInOutPort::new($value)),
+			Port::new("inbound", BoundInPort::with_value($value)),
+			Port::new("outbound", BoundOutPort::with_value($value)),
+			Port::new("inoutbound", BoundInOutPort::with_value($value)),
 		])
 	};
 }
 
 #[test]
-fn bound() {
+fn creation() {
 	let array = test_creation!(true);
 	let array = test_creation!(42);
 	let array = test_creation!(PI);

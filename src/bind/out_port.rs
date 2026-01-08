@@ -20,11 +20,11 @@ use crate::{
 pub struct BoundOutPort(PortValuePtr);
 
 impl BoundOutPort {
-	pub fn empty<T: AnyPortValueType>() -> Self {
+	pub fn new<T: AnyPortValueType>() -> Self {
 		Self(Arc::new(RwLock::new(PortValue::<T>::empty())))
 	}
 
-	pub fn new<T: AnyPortValueType>(value: T) -> Self {
+	pub fn with_value<T: AnyPortValueType>(value: T) -> Self {
 		Self(Arc::new(RwLock::new(PortValue::<T>::new(value))))
 	}
 

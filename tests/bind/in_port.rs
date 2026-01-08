@@ -11,14 +11,14 @@ use dataports::{BindIn, BoundInPort, PortValueReadGuard};
 
 macro_rules! test_get {
 	($value:expr) => {
-		let ip = BoundInPort::new($value);
+		let ip = BoundInPort::with_value($value);
 		assert_eq!(ip.get(), Some($value));
 	};
 }
 
 macro_rules! test_read {
 	($tp:ty, $value:expr) => {
-		let ip = BoundInPort::new($value);
+		let ip = BoundInPort::with_value($value);
 		let guard: PortValueReadGuard<$tp> = ip.read().unwrap();
 		assert_eq!(*guard, $value);
 	};
@@ -26,7 +26,7 @@ macro_rules! test_read {
 
 macro_rules! test_try_read {
 	($tp:ty, $value:expr) => {
-		let ip = BoundInPort::new($value);
+		let ip = BoundInPort::with_value($value);
 		let guard: PortValueReadGuard<$tp> = ip.try_read().unwrap();
 		assert_eq!(*guard, $value);
 	};

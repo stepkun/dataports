@@ -11,14 +11,14 @@ use dataports::{BindOut, BoundOutPort, PortValueWriteGuard};
 
 macro_rules! test_set {
 	($tp:ty, $value:expr) => {
-		let mut op = BoundOutPort::new($value);
+		let mut op = BoundOutPort::with_value($value);
 		assert!(op.set($value).is_ok());
 	};
 }
 
 macro_rules! test_write {
 	($tp:ty, $value:expr) => {
-		let mut op = BoundOutPort::new($value);
+		let mut op = BoundOutPort::with_value($value);
 		let mut guard: PortValueWriteGuard<$tp> = op.write().unwrap();
 		assert_eq!(*guard = $value, ());
 	};
@@ -26,7 +26,7 @@ macro_rules! test_write {
 
 macro_rules! test_try_write {
 	($tp:ty, $value:expr) => {
-		let mut op = BoundOutPort::new($value);
+		let mut op = BoundOutPort::with_value($value);
 		let mut guard: PortValueWriteGuard<$tp> = op.try_write().unwrap();
 		assert_eq!(*guard = $value, ());
 	};

@@ -11,14 +11,14 @@ use dataports::{BindIn, BindInOut, BindOut, BoundInOutPort, PortValueReadGuard, 
 
 macro_rules! test_get {
 	($value:expr) => {
-		let iop = BoundInOutPort::new($value);
+		let iop = BoundInOutPort::with_value($value);
 		assert_eq!(iop.get(), Some($value));
 	};
 }
 
 macro_rules! test_read {
 	($tp:ty, $value:expr) => {
-		let iop = BoundInOutPort::new($value);
+		let iop = BoundInOutPort::with_value($value);
 		let guard: PortValueReadGuard<$tp> = iop.read().unwrap();
 		assert_eq!(*guard, $value);
 	};
@@ -26,7 +26,7 @@ macro_rules! test_read {
 
 macro_rules! test_try_read {
 	($tp:ty, $value:expr) => {
-		let iop = BoundInOutPort::new($value);
+		let iop = BoundInOutPort::with_value($value);
 		let guard: PortValueReadGuard<$tp> = iop.try_read().unwrap();
 		assert_eq!(*guard, $value);
 	};
@@ -34,14 +34,14 @@ macro_rules! test_try_read {
 
 macro_rules! test_set {
 	($tp:ty, $value:expr) => {
-		let mut iop = BoundInOutPort::new($value);
+		let mut iop = BoundInOutPort::with_value($value);
 		assert!(iop.set($value).is_ok());
 	};
 }
 
 macro_rules! test_write {
 	($tp:ty, $value:expr) => {
-		let mut iop = BoundInOutPort::new($value);
+		let mut iop = BoundInOutPort::with_value($value);
 		let mut guard: PortValueWriteGuard<$tp> = iop.write().unwrap();
 		assert_eq!(*guard = $value, ());
 	};
@@ -49,7 +49,7 @@ macro_rules! test_write {
 
 macro_rules! test_try_write {
 	($tp:ty, $value:expr) => {
-		let mut iop = BoundInOutPort::new($value);
+		let mut iop = BoundInOutPort::with_value($value);
 		let mut guard: PortValueWriteGuard<$tp> = iop.try_write().unwrap();
 		assert_eq!(*guard = $value, ());
 	};
@@ -57,7 +57,7 @@ macro_rules! test_try_write {
 
 macro_rules! test_take_replace {
 	($tp:ty, $value:expr, $value2:expr) => {
-		let mut iop = BoundInOutPort::new($value);
+		let mut iop = BoundInOutPort::with_value($value);
 		assert_eq!(iop.replace($value2), Some($value));
 		assert_eq!(iop.take(), Some($value2));
 	};
