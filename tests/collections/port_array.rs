@@ -10,28 +10,34 @@ use core::f64::consts::PI;
 use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortArray};
 
 macro_rules! test_creation {
-	($value: expr) => {
+	($tp:ty, $value: expr) => {
 		PortArray::new([
-			Port::new("inbound", BoundInPort::with_value($value)),
-			Port::new("outbound", BoundOutPort::with_value($value)),
-			Port::new("inoutbound", BoundInOutPort::with_value($value)),
+			Port::new("inbound1", BoundInPort::with_value($value)),
+			Port::new("outbound1", BoundOutPort::with_value($value)),
+			Port::new("inoutbound1", BoundInOutPort::with_value($value)),
+			Port::new("inbound2", BoundInPort::new::<$tp>()),
+			Port::new("outbound2", BoundOutPort::new::<$tp>()),
+			Port::new("inoutbound2", BoundInOutPort::new::<$tp>()),
 		])
 	};
 }
 
 #[test]
-fn creation() {
-	let array = test_creation!(true);
-	let array = test_creation!(42);
-	let array = test_creation!(PI);
-	let array = test_creation!("str");
-	let array = test_creation!(String::from("string"));
-	let array = test_creation!(vec![1, 2, 3]);
-	let array = test_creation!(vec!["1", "2", "3"]);
-	let array = test_creation!(vec![
-		String::from("1"),
-		String::from("2"),
-		String::from("3")
-	]);
-	let array = test_creation!(vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
+fn array_creation() {
+	let array = test_creation!(bool, true);
+	let array = test_creation!(i32, 42);
+	let array = test_creation!(f64, PI);
+	let array = test_creation!(&str, "str");
+	let array = test_creation!(String, String::from("string"));
+	let array = test_creation!(Vec<i32>, vec![1, 2, 3]);
+	let array = test_creation!(Vec<&str>, vec!["1", "2", "3"]);
+	let array = test_creation!(
+		Vec<String>,
+		vec![
+			String::from("1"),
+			String::from("2"),
+			String::from("3")
+		]
+	);
+	let array = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }

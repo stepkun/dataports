@@ -9,7 +9,7 @@ use crate::{
 	ConstString, PortCommons,
 	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
 	collections::PortProvider,
-	error::Result,
+	error::{Error, Result},
 	port::Port,
 };
 
@@ -17,6 +17,22 @@ use crate::{
 #[derive(Default)]
 #[repr(transparent)]
 pub struct PortMap(BTreeMap<ConstString, Port>);
+
+impl PortMap {
+	pub fn new() -> Self {
+		Self(BTreeMap::new())
+	}
+
+	pub fn add(&mut self, port: Port) -> Result<()> {
+		let name = port.name();
+		if self.find(&name).is_some() {
+			Err(Error::AlreadyInCollection { name })
+		} else {
+			self.0.insert(name, port);
+			Ok(())
+		}
+	}
+}
 
 impl PortProvider for PortMap {
 	fn find(&self, name: &str) -> Option<&Port> {
