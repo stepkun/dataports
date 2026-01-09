@@ -7,7 +7,7 @@
 
 use core::f64::consts::PI;
 
-use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortList};
+use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortList, PortProvider};
 
 macro_rules! test_creation {
 	($tp:ty, $value: expr) => {{
@@ -41,20 +41,27 @@ macro_rules! test_creation {
 			list.add(Port::new("inoutbound2", BoundInOutPort::new::<$tp>()))
 				.is_err()
 		);
-		list
+
+		assert!(list.find("inbound").is_none());
+		assert!(list.find("inbound1").is_some());
+		assert!(list.find("outbound2").is_some());
+
+		assert!(list.find_mut("inoutbound").is_none());
+		assert!(list.find_mut("outbound1").is_some());
+		assert!(list.find_mut("inoutbound2").is_some());
 	}};
 }
 
 #[test]
 fn list_creation() {
-	let list = test_creation!(bool, true);
-	let list = test_creation!(i32, 42);
-	let list = test_creation!(f64, PI);
-	let list = test_creation!(&str, "str");
-	let list = test_creation!(String, String::from("string"));
-	let list = test_creation!(Vec<i32>, vec![1, 2, 3]);
-	let list = test_creation!(Vec<&str>, vec!["1", "2", "3"]);
-	let list = test_creation!(
+	test_creation!(bool, true);
+	test_creation!(i32, 42);
+	test_creation!(f64, PI);
+	test_creation!(&str, "str");
+	test_creation!(String, String::from("string"));
+	test_creation!(Vec<i32>, vec![1, 2, 3]);
+	test_creation!(Vec<&str>, vec!["1", "2", "3"]);
+	test_creation!(
 		Vec<String>,
 		vec![
 			String::from("1"),
@@ -62,5 +69,5 @@ fn list_creation() {
 			String::from("3")
 		]
 	);
-	let list = test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
+	test_creation!(Vec<Vec<f64>>, vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]]);
 }
