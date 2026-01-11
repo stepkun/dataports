@@ -26,7 +26,7 @@ pub trait BindCommons {
 }
 
 /// Trait for incoming bind port types.
-pub trait BindIn<T>: BindCommons {
+pub trait BindIn<T: AnyPortValueType>: BindCommons {
 	/// Returns a clone/copy of the T.
 	/// Therefore T must implement [`Clone`].
 	#[must_use]
@@ -49,7 +49,7 @@ pub trait BindIn<T>: BindCommons {
 }
 
 /// Trait for incoming and outgoing bind port types.
-pub trait BindInOut<T>: BindIn<T> + BindOut<T> {
+pub trait BindInOut<T: AnyPortValueType>: BindIn<T> + BindOut<T> {
 	/// Sets a new value to the T and returns the old T.
 	#[must_use]
 	fn replace(&mut self, value: T) -> Option<T>;
@@ -60,7 +60,7 @@ pub trait BindInOut<T>: BindIn<T> + BindOut<T> {
 }
 
 /// Trait for outgoing bind port types.
-pub trait BindOut<T>: BindCommons {
+pub trait BindOut<T: AnyPortValueType>: BindCommons {
 	/// Sets a new value to the T.
 	fn set(&mut self, value: T) -> Result<()>;
 

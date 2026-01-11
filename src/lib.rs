@@ -24,7 +24,7 @@ pub use bind::{
 	out_port::BoundOutPort,
 	port_value::{PortValueReadGuard, PortValueWriteGuard},
 };
-pub use collections::{PortProvider, port_array::PortArray, port_list::PortList, port_map::PortMap};
+pub use collections::{PortAccessors, PortProvider, port_array::PortArray, port_list::PortList, port_map::PortMap};
 //pub use flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort};
 pub use port_variant::PortVariant;
 

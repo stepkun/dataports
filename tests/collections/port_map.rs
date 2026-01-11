@@ -13,6 +13,18 @@ macro_rules! test_creation {
 	($tp:ty, $value: expr) => {{
 		let mut map = PortMap::new();
 		assert!(
+			map.add("inbound0", PortVariant::InBound(BoundInPort::new::<$tp>()))
+				.is_ok()
+		);
+		assert!(
+			map.add("outbound0", PortVariant::OutBound(BoundOutPort::new::<$tp>()))
+				.is_ok()
+		);
+		assert!(
+			map.add("inoutbound0", PortVariant::InOutBound(BoundInOutPort::new::<$tp>()))
+				.is_ok()
+		);
+		assert!(
 			map.add("inbound1", PortVariant::InBound(BoundInPort::with_value($value)))
 				.is_ok()
 		);
@@ -36,12 +48,21 @@ macro_rules! test_creation {
 			map.add("inoutbound2", PortVariant::create_inoutbound($value))
 				.is_ok()
 		);
+
 		assert!(map.find("inbound").is_none());
+		assert!(map.find("outbound").is_none());
+		assert!(map.find_mut("inoutbound").is_none());
+
+		assert!(map.find("inbound0").is_some());
 		assert!(map.find("inbound1").is_some());
+		assert!(map.find("inbound2").is_some());
+
+		assert!(map.find("outbound0").is_some());
+		assert!(map.find("outbound1").is_some());
 		assert!(map.find("outbound2").is_some());
 
-		assert!(map.find_mut("inoutbound").is_none());
-		assert!(map.find_mut("outbound1").is_some());
+		assert!(map.find_mut("inoutbound0").is_some());
+		assert!(map.find_mut("inoutbound1").is_some());
 		assert!(map.find_mut("inoutbound2").is_some());
 	}};
 }

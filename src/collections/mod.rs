@@ -7,6 +7,7 @@ use crate::{
 	BindCommons, ConstString,
 	bind::{
 		BindIn, BindInOut, BindOut,
+		any_port_value::AnyPortValueType,
 		port_value::{PortValueReadGuard, PortValueWriteGuard},
 	},
 	error::{Error, Result},
@@ -47,12 +48,12 @@ pub trait PortProvider {
 	}
 }
 
-pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvider {
+pub trait PortAccessors: PortProvider {
 	/// Returns a clone/copy of the T.
 	/// Therefore T must implement [`Clone`].
-	fn get(&self, name: &str) -> Result<Option<T>>
+	fn get<T>(&self, name: &str) -> Result<Option<T>>
 	where
-		T: Clone,
+		T: AnyPortValueType + Clone,
 	{
 		if let Some(port) = self.find(name) {
 			match port {
@@ -69,7 +70,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	/// # Errors
 	/// - [`Error::NotFound`](crate::error::Error), if port is not in port list.
 	/// - [`Error::WrongDataType`](crate::error::Error), if port is not the expected port type & type of T.
-	fn read(&self, name: &str) -> Result<PortValueReadGuard<T>> {
+	fn read<T: AnyPortValueType>(&self, name: &str) -> Result<PortValueReadGuard<T>> {
 		if let Some(port) = self.find(name) {
 			match port {
 				PortVariant::InBound(port) => port.read(),
@@ -86,7 +87,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	/// - [`Error::IsLocked`](crate::error::Error), if port is locked.
 	/// - [`Error::NotFound`](crate::error::Error), if port is not in port list.
 	/// - [`Error::WrongDataType`](crate::error::Error), if port is not the expected port type & type of T.
-	fn try_read(&self, name: &str) -> Result<PortValueReadGuard<T>> {
+	fn try_read<T: AnyPortValueType>(&self, name: &str) -> Result<PortValueReadGuard<T>> {
 		if let Some(port) = self.find(name) {
 			match port {
 				PortVariant::InBound(port) => port.try_read(),
@@ -99,7 +100,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	}
 
 	/// Sets a new value to the T and returns the old T.
-	fn replace(&mut self, name: &str, value: T) -> Result<Option<T>> {
+	fn replace<T: AnyPortValueType>(&mut self, name: &str, value: T) -> Result<Option<T>> {
 		if let Some(port) = self.find_mut(name) {
 			match port {
 				PortVariant::InOutBound(port) => Ok(port.replace(value)),
@@ -111,7 +112,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	}
 
 	/// Returns the T, removing it from the port.
-	fn take(&mut self, name: &str) -> Result<Option<T>> {
+	fn take<T: AnyPortValueType>(&mut self, name: &str) -> Result<Option<T>> {
 		if let Some(port) = self.find_mut(name) {
 			match port {
 				PortVariant::InOutBound(port) => Ok(port.take()),
@@ -123,7 +124,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	}
 
 	/// Sets a new value to the T.
-	fn set(&mut self, name: &str, value: T) -> Result<()> {
+	fn set<T: AnyPortValueType>(&mut self, name: &str, value: T) -> Result<()> {
 		if let Some(port) = self.find_mut(name) {
 			match port {
 				PortVariant::OutBound(port) => port.set(value),
@@ -139,7 +140,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	/// # Errors
 	/// - [`Error::NotFound`](crate::error::Error), if port is not in port list.
 	/// - [`Error::WrongDataType`](crate::error::Error), if port is not the expected port type & type of T.
-	fn write(&mut self, name: &str) -> Result<PortValueWriteGuard<T>> {
+	fn write<T: AnyPortValueType>(&mut self, name: &str) -> Result<PortValueWriteGuard<T>> {
 		if let Some(port) = self.find_mut(name) {
 			match port {
 				PortVariant::OutBound(port) => port.write(),
@@ -156,7 +157,7 @@ pub trait PortAccessors<T: 'static + Send + Sync + core::fmt::Debug>: PortProvid
 	/// - [`Error::IsLocked`](crate::error::Error), if port is locked.
 	/// - [`Error::NotFound`](crate::error::Error), if port is not in port list.
 	/// - [`Error::WrongDataType`](crate::error::Error), if port is not the expected port type & type of T.
-	fn try_write(&mut self, name: &str) -> Result<PortValueWriteGuard<T>> {
+	fn try_write<T: AnyPortValueType>(&mut self, name: &str) -> Result<PortValueWriteGuard<T>> {
 		if let Some(port) = self.find_mut(name) {
 			match port {
 				PortVariant::OutBound(port) => port.try_write(),

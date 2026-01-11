@@ -47,7 +47,7 @@ impl PortProvider for PortMap {
 	}
 }
 
-impl<T: AnyPortValueType> PortAccessors<T> for PortMap {}
+impl PortAccessors for PortMap {}
 
 #[cfg(test)]
 mod tests {

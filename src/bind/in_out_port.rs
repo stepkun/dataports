@@ -1,5 +1,5 @@
 // Copyright © 2026 Stephan Kunz
-//! A bound input type port implementing [`BindIn`].
+//! A bound input/output type port implementing [`BindIn`], [`BindOut`] and [`BindInOut`].
 
 use alloc::{boxed::Box, sync::Arc};
 use spin::RwLock;
@@ -19,16 +19,6 @@ use crate::{
 /// @TODO:
 #[derive(Debug)]
 pub struct BoundInOutPort(PortValuePtr);
-
-impl BindCommons for BoundInOutPort {
-	fn bind_to(&mut self, other: &PortVariant) -> Result<()> {
-		match other {
-			PortVariant::InBound(port) => self.set_value(port.value()),
-			PortVariant::InOutBound(port) => self.set_value(port.value()),
-			PortVariant::OutBound(port) => self.set_value(port.value()),
-		}
-	}
-}
 
 impl BoundInOutPort {
 	pub fn new<T: AnyPortValueType>() -> Self {
@@ -52,6 +42,16 @@ impl BoundInOutPort {
 
 	pub(crate) fn value(&self) -> PortValuePtr {
 		self.0.clone()
+	}
+}
+
+impl BindCommons for BoundInOutPort {
+	fn bind_to(&mut self, other: &PortVariant) -> Result<()> {
+		match other {
+			PortVariant::InBound(port) => self.set_value(port.value()),
+			PortVariant::InOutBound(port) => self.set_value(port.value()),
+			PortVariant::OutBound(port) => self.set_value(port.value()),
+		}
 	}
 }
 

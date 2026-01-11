@@ -53,7 +53,7 @@ impl PortProvider for PortList {
 	}
 }
 
-impl<T: AnyPortValueType> PortAccessors<T> for PortList {}
+impl PortAccessors for PortList {}
 
 #[cfg(test)]
 mod tests {

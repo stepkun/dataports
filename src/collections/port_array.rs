@@ -54,7 +54,7 @@ impl<const S: usize> PortProvider for PortArray<S> {
 	}
 }
 
-impl<const S: usize, T: AnyPortValueType> PortAccessors<T> for PortArray<S> {}
+impl<const S: usize> PortAccessors for PortArray<S> {}
 
 #[cfg(test)]
 mod tests {
