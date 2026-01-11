@@ -6,47 +6,47 @@
 use alloc::vec::Vec;
 
 use crate::{
-	PortCommons,
+	ConstString,
 	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
 	collections::PortProvider,
 	error::{Error, Result},
-	port::Port,
+	port_variant::PortVariant,
 };
 
 /// An extendable unsorted list of [`Port`]s.
 #[derive(Default)]
 #[repr(transparent)]
-pub struct PortList(Vec<Port>);
+pub struct PortList(Vec<(ConstString, PortVariant)>);
 
 impl PortList {
 	pub fn new() -> Self {
 		Self(Vec::new())
 	}
 
-	pub fn add(&mut self, port: Port) -> Result<()> {
-		let name = port.name();
+	pub fn add(&mut self, name: impl Into<ConstString>, port: PortVariant) -> Result<()> {
+		let name = name.into();
 		if self.find(&name).is_some() {
 			Err(Error::AlreadyInCollection { name })
 		} else {
-			self.0.push(port);
+			self.0.push((name, port));
 			Ok(())
 		}
 	}
 }
 
 impl PortProvider for PortList {
-	fn find(&self, name: &str) -> Option<&Port> {
+	fn find(&self, name: &str) -> Option<&PortVariant> {
 		self.0
 			.iter()
-			.find(|port| &*port.name() == name)
-			.map(|v| v as _)
+			.find(|port| &*port.0 == name)
+			.map(|v| &v.1 as _)
 	}
 
-	fn find_mut(&mut self, name: &str) -> Option<&mut Port> {
+	fn find_mut(&mut self, name: &str) -> Option<&mut PortVariant> {
 		self.0
 			.iter_mut()
-			.find(|port| &*port.name() == name)
-			.map(|v| v as _)
+			.find(|port| &*port.0 == name)
+			.map(|v| &mut v.1 as _)
 	}
 }
 

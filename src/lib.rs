@@ -26,22 +26,17 @@ pub use bind::{
 };
 pub use collections::{PortProvider, port_array::PortArray, port_list::PortList, port_map::PortMap};
 //pub use flow::{in_out_port::FlowingInOutPort, in_port::FlowingInPort, out_port::FlowingOutPort};
-pub use port::Port;
+pub use port_variant::PortVariant;
 
-use crate::{any_port::AnyPortType, error::Result};
+use crate::error::Result;
 
 // internal module structure
-mod any_port;
 mod bind;
 mod collections;
 mod error;
 //mod flow;
-mod port;
+mod port_variant;
 
 /// An immutable thread safe `String` type
 /// see: [Logan Smith](https://www.youtube.com/watch?v=A4cKi7PTJSs).
 type ConstString = Arc<str>;
-
-trait PortCommons {
-	fn name(&self) -> ConstString;
-}

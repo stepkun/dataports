@@ -11,18 +11,18 @@ pub mod port_value;
 mod sequence_number;
 
 use crate::{
-	any_port::AnyPortType,
 	bind::{
 		any_port_value::AnyPortValueType,
 		port_value::{PortValueReadGuard, PortValueWriteGuard},
 	},
 	error::Result,
+	port_variant::PortVariant,
 };
 
 /// Trait for bind port types.
 pub trait BindCommons {
 	/// Binds port to another port.
-	fn bind_to(&mut self, other: &dyn AnyPortType) -> Result<()>;
+	fn bind_to(&mut self, other: &PortVariant) -> Result<()>;
 }
 
 /// Trait for incoming bind port types.

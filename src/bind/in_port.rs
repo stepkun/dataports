@@ -15,6 +15,7 @@ use crate::{
 		port_value::{PortValue, PortValuePtr, PortValueReadGuard},
 	},
 	error::{Error, Result},
+	port_variant::PortVariant,
 };
 
 /// @TODO:
@@ -47,15 +48,11 @@ impl BoundInPort {
 }
 
 impl BindCommons for BoundInPort {
-	fn bind_to(&mut self, other: &dyn crate::any_port::AnyPortType) -> crate::error::Result<()> {
-		if let Some(port) = other.as_any().downcast_ref::<BoundInPort>() {
-			self.set_value(port.value())
-		} else if let Some(port) = other.as_any().downcast_ref::<BoundOutPort>() {
-			self.set_value(port.value())
-		} else if let Some(port) = other.as_any().downcast_ref::<BoundInOutPort>() {
-			self.set_value(port.value())
-		} else {
-			todo!("missing implementation for new port type")
+	fn bind_to(&mut self, other: &PortVariant) -> Result<()> {
+		match other {
+			PortVariant::InBound(port) => self.set_value(port.value()),
+			PortVariant::InOutBound(port) => self.set_value(port.value()),
+			PortVariant::OutBound(port) => self.set_value(port.value()),
 		}
 	}
 }

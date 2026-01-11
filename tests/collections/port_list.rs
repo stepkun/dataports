@@ -7,39 +7,34 @@
 
 use core::f64::consts::PI;
 
-use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortList, PortProvider};
+use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, PortList, PortProvider, PortVariant};
 
 macro_rules! test_creation {
 	($tp:ty, $value: expr) => {{
 		let mut list = PortList::new();
 		assert!(
-			list.add(Port::new("inbound1", BoundInPort::with_value($value)))
+			list.add("inbound1", PortVariant::InBound(BoundInPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			list.add(Port::new("outbound1", BoundOutPort::with_value($value)))
+			list.add("outbound1", PortVariant::OutBound(BoundOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			list.add(Port::new("inoutbound1", BoundInOutPort::with_value($value)))
+			list.add("inoutbound1", PortVariant::InOutBound(BoundInOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			list.add(Port::new("inbound2", BoundInPort::new::<$tp>()))
+			list.add("inbound2", PortVariant::InBound(BoundInPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			list.add(Port::new("outbound2", BoundOutPort::new::<$tp>()))
+			list.add("outbound2", PortVariant::OutBound(BoundOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			list.add(Port::new("inoutbound2", BoundInOutPort::new::<$tp>()))
+			list.add("inoutbound2", PortVariant::InOutBound(BoundInOutPort::with_value($value)))
 				.is_ok()
-		);
-
-		assert!(
-			list.add(Port::new("inoutbound2", BoundInOutPort::new::<$tp>()))
-				.is_err()
 		);
 
 		assert!(list.find("inbound").is_none());

@@ -7,17 +7,29 @@
 
 use core::f64::consts::PI;
 
-use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortArray, PortProvider};
+use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, PortArray, PortProvider, PortVariant};
 
 macro_rules! test_creation {
 	($tp:ty, $value: expr) => {
 		let mut array = PortArray::new([
-			Port::new("inbound1", BoundInPort::with_value($value)),
-			Port::new("outbound1", BoundOutPort::with_value($value)),
-			Port::new("inoutbound1", BoundInOutPort::with_value($value)),
-			Port::new("inbound2", BoundInPort::new::<$tp>()),
-			Port::new("outbound2", BoundOutPort::new::<$tp>()),
-			Port::new("inoutbound2", BoundInOutPort::new::<$tp>()),
+			("inbound1".into(), PortVariant::InBound(BoundInPort::with_value($value))),
+			(
+				"outbound1".into(),
+				PortVariant::OutBound(BoundOutPort::with_value($value)),
+			),
+			(
+				"inoutbound1".into(),
+				PortVariant::InOutBound(BoundInOutPort::with_value($value)),
+			),
+			("inbound2".into(), PortVariant::InBound(BoundInPort::with_value($value))),
+			(
+				"outbound2".into(),
+				PortVariant::OutBound(BoundOutPort::with_value($value)),
+			),
+			(
+				"inoutbound2".into(),
+				PortVariant::InOutBound(BoundInOutPort::with_value($value)),
+			),
 		]);
 
 		assert!(array.find("inbound").is_none());

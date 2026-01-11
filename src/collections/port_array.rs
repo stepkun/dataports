@@ -4,19 +4,19 @@
 #![allow(unused)]
 
 use crate::{
-	PortCommons,
+	ConstString,
 	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
 	collections::PortProvider,
 	error::Result,
-	port::Port,
+	port_variant::PortVariant,
 };
 
 /// A fixed unsorted array of [`Port`]s.
 #[repr(transparent)]
-pub struct PortArray<const S: usize>([Port; S]);
+pub struct PortArray<const S: usize>([(ConstString, PortVariant); S]);
 
 impl<const S: usize> PortArray<S> {
-	pub fn new(ports: [Port; S]) -> Self {
+	pub fn new(ports: [(ConstString, PortVariant); S]) -> Self {
 		Self(ports)
 	}
 }
@@ -28,7 +28,7 @@ impl<const S: usize> core::fmt::Debug for PortArray<S> {
 }
 
 impl<const S: usize> core::ops::Deref for PortArray<S> {
-	type Target = [Port];
+	type Target = [(ConstString, PortVariant)];
 
 	fn deref(&self) -> &Self::Target {
 		&self.0
@@ -36,18 +36,18 @@ impl<const S: usize> core::ops::Deref for PortArray<S> {
 }
 
 impl<const S: usize> PortProvider for PortArray<S> {
-	fn find(&self, name: &str) -> Option<&Port> {
+	fn find(&self, name: &str) -> Option<&PortVariant> {
 		self.0
 			.iter()
-			.find(|port| &*port.name() == name)
-			.map(|v| v as _)
+			.find(|port| &*port.0 == name)
+			.map(|v| &v.1 as _)
 	}
 
-	fn find_mut(&mut self, name: &str) -> Option<&mut Port> {
+	fn find_mut(&mut self, name: &str) -> Option<&mut PortVariant> {
 		self.0
 			.iter_mut()
-			.find(|port| &*port.name() == name)
-			.map(|v| v as _)
+			.find(|port| &*port.0 == name)
+			.map(|v| &mut v.1 as _)
 	}
 }
 

@@ -7,41 +7,35 @@
 
 use core::f64::consts::PI;
 
-use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, Port, PortMap, PortProvider};
+use dataports::{BoundInOutPort, BoundInPort, BoundOutPort, PortMap, PortProvider, PortVariant};
 
 macro_rules! test_creation {
 	($tp:ty, $value: expr) => {{
 		let mut map = PortMap::new();
 		assert!(
-			map.add(Port::new("inbound1", BoundInPort::with_value($value)))
+			map.add("inbound1", PortVariant::InBound(BoundInPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			map.add(Port::new("outbound1", BoundOutPort::with_value($value)))
+			map.add("outbound1", PortVariant::OutBound(BoundOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			map.add(Port::new("inoutbound1", BoundInOutPort::with_value($value)))
+			map.add("inoutbound1", PortVariant::InOutBound(BoundInOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			map.add(Port::new("inbound2", BoundInPort::new::<$tp>()))
+			map.add("inbound2", PortVariant::InBound(BoundInPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			map.add(Port::new("outbound2", BoundOutPort::new::<$tp>()))
+			map.add("outbound2", PortVariant::OutBound(BoundOutPort::with_value($value)))
 				.is_ok()
 		);
 		assert!(
-			map.add(Port::new("inoutbound2", BoundInOutPort::new::<$tp>()))
+			map.add("inoutbound2", PortVariant::InOutBound(BoundInOutPort::with_value($value)))
 				.is_ok()
 		);
-
-		assert!(
-			map.add(Port::new("inoutbound2", BoundInOutPort::new::<$tp>()))
-				.is_err()
-		);
-
 		assert!(map.find("inbound").is_none());
 		assert!(map.find("inbound1").is_some());
 		assert!(map.find("outbound2").is_some());

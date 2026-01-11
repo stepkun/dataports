@@ -17,6 +17,8 @@ pub enum Error {
 	NoValueSet,
 	/// A port has other data type then expected.
 	WrongDataType,
+	/// A port is not the needed type.
+	WrongPortType,
 }
 
 /// Only default implementation needed.
@@ -29,6 +31,7 @@ impl core::fmt::Debug for Error {
 			Self::IsLocked => write!(f, "IsLocked"),
 			Self::NoValueSet => write!(f, "NoValueSet"),
 			Self::WrongDataType => write!(f, "WrongDataType"),
+			Self::WrongPortType => write!(f, "WrongPortType"),
 		}
 	}
 }
@@ -40,6 +43,7 @@ impl core::fmt::Display for Error {
 			Self::IsLocked => write!(f, "port is currently locked"),
 			Self::NoValueSet => write!(f, "no value set for port"),
 			Self::WrongDataType => write!(f, "port has a different data type then expected"),
+			Self::WrongPortType => write!(f, "port has an incompatible type"),
 		}
 	}
 }

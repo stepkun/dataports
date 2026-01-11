@@ -4,10 +4,10 @@
 #![allow(unused)]
 
 use crate::{
-	ConstString, Port,
-	any_port::AnyPortType,
+	ConstString,
 	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
 	error::Result,
+	port_variant::PortVariant,
 };
 
 pub mod port_array;
@@ -23,11 +23,11 @@ trait PortCommons {
 pub trait PortProvider {
 	/// Returns a port from the collection.
 	/// This method needs a collection specific implementation.
-	fn find(&self, name: &str) -> Option<&Port>;
+	fn find(&self, name: &str) -> Option<&PortVariant>;
 
 	/// Returns a mutable port from the collection.
 	/// This method needs a collection specific implementation.
-	fn find_mut(&mut self, name: &str) -> Option<&mut Port>;
+	fn find_mut(&mut self, name: &str) -> Option<&mut PortVariant>;
 
 	/// Connects a port to a port from another list.
 	/// Type of connection depends on types of both ports.

@@ -5,7 +5,6 @@ use alloc::{boxed::Box, sync::Arc};
 use spin::RwLock;
 
 use crate::{
-	any_port::AnyPortType,
 	bind::{
 		BindCommons, BindIn, BindInOut, BindOut,
 		any_port_value::AnyPortValueType,
@@ -14,6 +13,7 @@ use crate::{
 		port_value::{PortValue, PortValuePtr, PortValueReadGuard, PortValueWriteGuard},
 	},
 	error::{Error, Result},
+	port_variant::PortVariant,
 };
 
 /// @TODO:
@@ -21,15 +21,11 @@ use crate::{
 pub struct BoundInOutPort(PortValuePtr);
 
 impl BindCommons for BoundInOutPort {
-	fn bind_to(&mut self, other: &dyn AnyPortType) -> Result<()> {
-		if let Some(port) = other.as_any().downcast_ref::<BoundInPort>() {
-			self.set_value(port.value())
-		} else if let Some(port) = other.as_any().downcast_ref::<BoundOutPort>() {
-			self.set_value(port.value())
-		} else if let Some(port) = other.as_any().downcast_ref::<BoundInOutPort>() {
-			self.set_value(port.value())
-		} else {
-			todo!("missing implementation for new port type")
+	fn bind_to(&mut self, other: &PortVariant) -> Result<()> {
+		match other {
+			PortVariant::InBound(port) => self.set_value(port.value()),
+			PortVariant::InOutBound(port) => self.set_value(port.value()),
+			PortVariant::OutBound(port) => self.set_value(port.value()),
 		}
 	}
 }
