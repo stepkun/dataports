@@ -69,11 +69,11 @@ impl<T: AnyPortValueType> BindOut<T> for BoundOutPort {
 		}
 	}
 
-	fn write(&mut self) -> crate::error::Result<PortValueWriteGuard<T>> {
+	fn write(&mut self) -> Result<PortValueWriteGuard<T>> {
 		PortValueWriteGuard::new(self.0.clone())
 	}
 
-	fn try_write(&mut self) -> crate::error::Result<PortValueWriteGuard<T>> {
+	fn try_write(&mut self) -> Result<PortValueWriteGuard<T>> {
 		PortValueWriteGuard::try_new(self.0.clone())
 	}
 }

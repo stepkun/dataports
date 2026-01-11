@@ -25,15 +25,15 @@ macro_rules! test_creation {
 				.is_ok()
 		);
 		assert!(
-			map.add("inbound2", PortVariant::InBound(BoundInPort::with_value($value)))
+			map.add("inbound2", PortVariant::create_inbound($value))
 				.is_ok()
 		);
 		assert!(
-			map.add("outbound2", PortVariant::OutBound(BoundOutPort::with_value($value)))
+			map.add("outbound2", PortVariant::create_outbound($value))
 				.is_ok()
 		);
 		assert!(
-			map.add("inoutbound2", PortVariant::InOutBound(BoundInOutPort::with_value($value)))
+			map.add("inoutbound2", PortVariant::create_inoutbound($value))
 				.is_ok()
 		);
 		assert!(map.find("inbound").is_none());

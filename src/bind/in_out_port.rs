@@ -68,11 +68,11 @@ impl<T: AnyPortValueType> BindIn<T> for BoundInOutPort {
 		}
 	}
 
-	fn read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+	fn read(&self) -> Result<PortValueReadGuard<T>> {
 		PortValueReadGuard::new(self.0.clone())
 	}
 
-	fn try_read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+	fn try_read(&self) -> Result<PortValueReadGuard<T>> {
 		PortValueReadGuard::try_new(self.0.clone())
 	}
 }
@@ -113,15 +113,15 @@ impl<T: AnyPortValueType> BindOut<T> for BoundInOutPort {
 			t_ref.set(value);
 			Ok(())
 		} else {
-			Err(crate::error::Error::WrongDataType)
+			Err(Error::WrongDataType)
 		}
 	}
 
-	fn write(&mut self) -> crate::error::Result<PortValueWriteGuard<T>> {
+	fn write(&mut self) -> Result<PortValueWriteGuard<T>> {
 		PortValueWriteGuard::new(self.0.clone())
 	}
 
-	fn try_write(&mut self) -> crate::error::Result<PortValueWriteGuard<T>> {
+	fn try_write(&mut self) -> Result<PortValueWriteGuard<T>> {
 		PortValueWriteGuard::try_new(self.0.clone())
 	}
 }

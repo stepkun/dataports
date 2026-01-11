@@ -21,15 +21,9 @@ macro_rules! test_creation {
 				"inoutbound1".into(),
 				PortVariant::InOutBound(BoundInOutPort::with_value($value)),
 			),
-			("inbound2".into(), PortVariant::InBound(BoundInPort::with_value($value))),
-			(
-				"outbound2".into(),
-				PortVariant::OutBound(BoundOutPort::with_value($value)),
-			),
-			(
-				"inoutbound2".into(),
-				PortVariant::InOutBound(BoundInOutPort::with_value($value)),
-			),
+			("inbound2".into(), PortVariant::create_inbound($value)),
+			("outbound2".into(), PortVariant::create_outbound($value)),
+			("inoutbound2".into(), PortVariant::create_inoutbound($value)),
 		]);
 
 		assert!(array.find("inbound").is_none());

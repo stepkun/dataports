@@ -10,7 +10,8 @@ use alloc::boxed::Box;
 use crate::{
 	ConstString,
 	bind::{
-		BindCommons, BindIn, BindInOut, BindOut, in_out_port::BoundInOutPort, in_port::BoundInPort, out_port::BoundOutPort,
+		BindCommons, BindIn, BindInOut, BindOut, any_port_value::AnyPortValueType, in_out_port::BoundInOutPort,
+		in_port::BoundInPort, out_port::BoundOutPort,
 	},
 	error::{Error, Result},
 };
@@ -28,6 +29,18 @@ pub enum PortVariant {
 }
 
 impl PortVariant {
+	pub fn create_inbound<T: AnyPortValueType>(value: T) -> Self {
+		Self::InBound(BoundInPort::with_value(value))
+	}
+
+	pub fn create_inoutbound<T: AnyPortValueType>(value: T) -> Self {
+		Self::InOutBound(BoundInOutPort::with_value(value))
+	}
+
+	pub fn create_outbound<T: AnyPortValueType>(value: T) -> Self {
+		Self::OutBound(BoundOutPort::with_value(value))
+	}
+
 	pub fn connect_to(&mut self, other: &PortVariant) -> Result<()> {
 		match self {
 			Self::InBound(port) => port.bind_to(other),

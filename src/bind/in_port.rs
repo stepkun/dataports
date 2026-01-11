@@ -70,11 +70,11 @@ impl<T: AnyPortValueType> BindIn<T> for BoundInPort {
 		}
 	}
 
-	fn read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+	fn read(&self) -> Result<PortValueReadGuard<T>> {
 		PortValueReadGuard::new(self.0.clone())
 	}
 
-	fn try_read(&self) -> crate::error::Result<PortValueReadGuard<T>> {
+	fn try_read(&self) -> Result<PortValueReadGuard<T>> {
 		PortValueReadGuard::try_new(self.0.clone())
 	}
 }
