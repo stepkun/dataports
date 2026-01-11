@@ -5,8 +5,11 @@
 
 use crate::{
 	ConstString,
-	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
-	collections::PortProvider,
+	bind::{
+		any_port_value::AnyPortValueType,
+		port_value::{PortValueReadGuard, PortValueWriteGuard},
+	},
+	collections::{PortAccessors, PortProvider},
 	error::Result,
 	port_variant::PortVariant,
 };
@@ -50,6 +53,8 @@ impl<const S: usize> PortProvider for PortArray<S> {
 			.map(|v| &mut v.1 as _)
 	}
 }
+
+impl<const S: usize, T: AnyPortValueType> PortAccessors<T> for PortArray<S> {}
 
 #[cfg(test)]
 mod tests {

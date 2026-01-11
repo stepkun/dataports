@@ -7,8 +7,11 @@ use alloc::collections::btree_map::BTreeMap;
 
 use crate::{
 	ConstString,
-	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
-	collections::PortProvider,
+	bind::{
+		any_port_value::AnyPortValueType,
+		port_value::{PortValueReadGuard, PortValueWriteGuard},
+	},
+	collections::{PortAccessors, PortProvider},
 	error::{Error, Result},
 	port_variant::PortVariant,
 };
@@ -43,6 +46,8 @@ impl PortProvider for PortMap {
 		self.0.get_mut(name)
 	}
 }
+
+impl<T: AnyPortValueType> PortAccessors<T> for PortMap {}
 
 #[cfg(test)]
 mod tests {

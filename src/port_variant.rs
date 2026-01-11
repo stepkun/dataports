@@ -1,5 +1,5 @@
 // Copyright © 2026 Stephan Kunz
-//! Port varianrs.
+//! Port variants.
 
 #![allow(unused)]
 
@@ -15,7 +15,10 @@ use crate::{
 	error::{Error, Result},
 };
 
-/// A type erased port.
+/// Implemented set of port variants.
+/// - InBound: bound to some other ports value, only readable
+/// - InOutBound: bound to some other ports value, read- & writeable
+/// - OutBound: bound to some other ports value, only writeable
 #[allow(clippy::enum_variant_names)] // the flow variants to be expected
 #[derive(Debug, Clone)]
 pub enum PortVariant {

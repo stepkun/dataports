@@ -3,7 +3,7 @@
 
 #![allow(unused)]
 
-mod any_port_value;
+pub mod any_port_value;
 pub mod in_out_port;
 pub mod in_port;
 pub mod out_port;
@@ -21,7 +21,7 @@ use crate::{
 
 /// Trait for bind port types.
 pub trait BindCommons {
-	/// Binds port to another port.
+	/// Binds a port to another port variant.
 	fn bind_to(&mut self, other: &PortVariant) -> Result<()>;
 }
 

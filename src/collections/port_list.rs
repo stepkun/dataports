@@ -7,8 +7,11 @@ use alloc::vec::Vec;
 
 use crate::{
 	ConstString,
-	bind::port_value::{PortValueReadGuard, PortValueWriteGuard},
-	collections::PortProvider,
+	bind::{
+		any_port_value::AnyPortValueType,
+		port_value::{PortValueReadGuard, PortValueWriteGuard},
+	},
+	collections::{PortAccessors, PortProvider},
 	error::{Error, Result},
 	port_variant::PortVariant,
 };
@@ -49,6 +52,8 @@ impl PortProvider for PortList {
 			.map(|v| &mut v.1 as _)
 	}
 }
+
+impl<T: AnyPortValueType> PortAccessors<T> for PortList {}
 
 #[cfg(test)]
 mod tests {
