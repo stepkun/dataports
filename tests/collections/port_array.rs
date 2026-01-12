@@ -119,16 +119,123 @@ macro_rules! test_accessors {
 		assert!(array.set("test", $value2).is_err());
 		assert!(array.set("inbound0", $value2).is_err());
 		assert!(array.set("outbound0", $value2).is_ok());
-		//@TODO:!! assert!(array.set("inoutbound0", $value2).is_ok());
+		assert!(array.set("inoutbound0", $value2).is_ok());
+		assert_eq!(*array.read::<$tp>("inoutbound0").unwrap(), $value2);
 		assert!(array.set("inbound1", $value2).is_err());
 		assert!(array.set("outbound1", $value2).is_ok());
 		assert!(array.set("inoutbound1", $value2).is_ok());
+		assert_eq!(array.get::<$tp>("inoutbound1").unwrap(), Some($value2));
+
+		{
+			assert!(array.write::<$tp>("test").is_err());
+			assert!(array.write::<$tp>("inbound0").is_err());
+			let mut g_out = array.write::<$tp>("outbound0").unwrap();
+			assert_eq!(*g_out, $value2);
+			*g_out = $value1;
+			assert_eq!(*g_out, $value1);
+			let mut g_inout = array.write::<$tp>("inoutbound0").unwrap();
+			assert_eq!(*g_inout, $value2);
+			*g_inout = $value1;
+			assert_eq!(*g_inout, $value1);
+			assert!(array.write::<$tp>("inbound1").is_err());
+			let mut g_out = array.write::<$tp>("outbound1").unwrap();
+			assert_eq!(*g_out, $value2);
+			*g_out = $value1;
+			assert_eq!(*g_out, $value1);
+			let mut g_inout = array.write::<$tp>("inoutbound1").unwrap();
+			assert_eq!(*g_inout, $value2);
+			*g_inout = $value1;
+			assert_eq!(*g_inout, $value1);
+		}
+		{
+			assert!(array.try_write::<$tp>("test").is_err());
+			assert!(array.try_write::<$tp>("inbound0").is_err());
+			let mut g_out = array.try_write::<$tp>("outbound0").unwrap();
+			assert_eq!(*g_out, $value1);
+			*g_out = $value2;
+			assert_eq!(*g_out, $value2);
+			let mut g_inout = array.try_write::<$tp>("inoutbound0").unwrap();
+			assert_eq!(*g_inout, $value1);
+			*g_inout = $value2;
+			assert_eq!(*g_inout, $value2);
+			assert!(array.try_write::<$tp>("inbound1").is_err());
+			let mut g_out = array.try_write::<$tp>("outbound1").unwrap();
+			assert_eq!(*g_out, $value1);
+			*g_out = $value2;
+			assert_eq!(*g_out, $value2);
+			let mut g_inout = array.try_write::<$tp>("inoutbound1").unwrap();
+			assert_eq!(*g_inout, $value1);
+			*g_inout = $value2;
+			assert_eq!(*g_inout, $value2);
+		}
+		{
+			assert!(array.replace::<$tp>("test", $value1).is_err());
+			assert!(array.replace::<$tp>("inbound0", $value1).is_err());
+			assert!(
+				array
+					.replace::<$tp>("outbound0", $value1)
+					.is_err()
+			);
+			assert_eq!(
+				array
+					.replace::<$tp>("inoutbound0", $value1)
+					.unwrap(),
+				Some($value2)
+			);
+			assert!(array.replace::<$tp>("inbound1", $value1).is_err());
+			assert!(
+				array
+					.replace::<$tp>("outbound1", $value1)
+					.is_err()
+			);
+			assert_eq!(
+				array
+					.replace::<$tp>("inoutbound1", $value1)
+					.unwrap(),
+				Some($value2)
+			);
+		}
+		{
+			assert!(array.take::<$tp>("test").is_err());
+			assert!(array.take::<$tp>("inbound0").is_err());
+			assert!(array.take::<$tp>("outbound0").is_err());
+			assert_eq!(array.take::<$tp>("inoutbound0").unwrap(), Some($value1));
+			assert_eq!(array.take::<$tp>("inoutbound0").unwrap(), None);
+			assert!(array.take::<$tp>("inbound1").is_err());
+			assert!(array.take::<$tp>("outbound1").is_err());
+			assert_eq!(array.take::<$tp>("inoutbound1").unwrap(), Some($value1));
+			assert_eq!(array.take::<$tp>("inoutbound1").unwrap(), None);
+		}
 	};
 }
 
 #[test]
 fn array_accessors() {
 	test_accessors!(bool, true, false);
+	test_accessors!(i32, 42, 24);
+	test_accessors!(f64, PI, 6.0);
+	test_accessors!(&str, "str", "other");
+	test_accessors!(String, String::from("string"), String::from("other"));
+	test_accessors!(Vec<i32>, vec![1, 2, 3], vec![3, 2, 1]);
+	test_accessors!(Vec<&str>, vec!["1", "2", "3"], vec!["3", "2", "1"]);
+	test_accessors!(
+		Vec<String>,
+		vec![
+			String::from("1"),
+			String::from("2"),
+			String::from("3")
+		],
+		vec![
+			String::from("3"),
+			String::from("2"),
+			String::from("1")
+		]
+	);
+	test_accessors!(
+		Vec<Vec<f64>>,
+		vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]],
+		vec![vec![6.0, 5.0, 4.0], vec![3.0, 2.0, 1.0]]
+	);
 }
 
 #[test]

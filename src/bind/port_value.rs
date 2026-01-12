@@ -128,7 +128,7 @@ impl<T: 'static> PortValueReadGuard<T> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			let guard = value.read();
-			// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer
+			// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer.
 			// We have to take care of unlocking manually.
 			let x = RwLockReadGuard::leak(guard);
 			if let Some(v) = x.as_any().downcast_ref::<PortValue<T>>() {
