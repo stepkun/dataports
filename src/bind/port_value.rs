@@ -121,23 +121,32 @@ impl<T> Drop for PortValueReadGuard<T> {
 }
 
 impl<T: 'static> PortValueReadGuard<T> {
-	/// Returns a read guard to a T.
+	/// Returns a read guard to the T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
 	pub(crate) fn new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			let guard = value.read();
-			// leak returns &'rwlock &Option<T> but read locks RwLock forewer
+			// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer
+			// We have to take care of unlocking manually.
 			let x = RwLockReadGuard::leak(guard);
 			if let Some(v) = x.as_any().downcast_ref::<PortValue<T>>() {
 				if let Some(value) = &v.0 {
 					let ptr_t: *const T = value;
 					ptr_t
 				} else {
+					// SAFETY: Remove the lock
+					unsafe {
+						value.force_read_decrement();
+					};
 					return Err(Error::NoValueSet);
 				}
 			} else {
+				// SAFETY: Remove the lock
+				unsafe {
+					value.force_read_decrement();
+				};
 				return Err(Error::WrongDataType);
 			}
 		};
@@ -145,7 +154,7 @@ impl<T: 'static> PortValueReadGuard<T> {
 		Ok(Self { value, ptr_t })
 	}
 
-	/// Returns a read guard to a T.
+	/// Returns a read guard to the T.
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
@@ -153,16 +162,25 @@ impl<T: 'static> PortValueReadGuard<T> {
 		// we know this pointer is valid since the guard owns the value
 		let ptr_t = {
 			if let Some(guard) = value.try_read() {
-				// leak returns &'rwlock &Option<T> but read locks RwLock forewer
+				// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer.
+				// We have to take care of unlocking manually.
 				let x = RwLockReadGuard::leak(guard);
 				if let Some(v) = x.as_any().downcast_ref::<PortValue<T>>() {
 					if let Some(value) = &v.0 {
 						let ptr_t: *const T = value;
 						ptr_t
 					} else {
+						// SAFETY: Remove the lock
+						unsafe {
+							value.force_read_decrement();
+						};
 						return Err(Error::NoValueSet);
 					}
 				} else {
+					// SAFETY: Remove the lock
+					unsafe {
+						value.force_read_decrement();
+					};
 					return Err(Error::WrongDataType);
 				}
 			} else {
@@ -226,14 +244,15 @@ impl<T> Drop for PortValueWriteGuard<T> {
 }
 
 impl<T: 'static> PortValueWriteGuard<T> {
-	/// Returns a write guard to a T.
+	/// Returns a write guard to the T.
 	/// # Errors
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
 	pub(crate) fn new(value: PortValuePtr) -> Result<Self> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			let guard = value.write();
-			// leak returns &'rwlock &Option<T> but write locks RwLock forewer
+			// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer.
+			// We have to take care of unlocking manually.
 			let x = RwLockWriteGuard::leak(guard);
 			if let Some(v) = x.as_mut_any().downcast_mut::<PortValue<T>>() {
 				if let Some(value) = &mut v.0 {
@@ -241,9 +260,17 @@ impl<T: 'static> PortValueWriteGuard<T> {
 					let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
 					(ptr_t, ptr_seq_id)
 				} else {
+					// SAFETY: Remove the lock
+					unsafe {
+						value.force_write_unlock();
+					};
 					return Err(Error::NoValueSet);
 				}
 			} else {
+				// SAFETY: Remove the lock
+				unsafe {
+					value.force_write_unlock();
+				};
 				return Err(Error::WrongDataType);
 			}
 		};
@@ -256,7 +283,7 @@ impl<T: 'static> PortValueWriteGuard<T> {
 		})
 	}
 
-	/// Returns a write guard to a T.
+	/// Returns a write guard to the T.
 	/// # Errors
 	/// - [`Error::IsLocked`]  if the entry is locked by someone else.
 	/// - [`Error::NoValueSet`] if the port does not yet contain a value.
@@ -264,7 +291,8 @@ impl<T: 'static> PortValueWriteGuard<T> {
 		// we know this pointer is valid since the guard owns the value
 		let (ptr_t, ptr_seq_id) = {
 			if let Some(guard) = value.try_write() {
-				// leak returns &'rwlock &Option<T> but write locks RwLock forewer
+				// SAFETY: leak returns &'rwlock &Option<T> but locks RwLock forewer.
+				// We have to take care of unlocking manually.
 				let x = RwLockWriteGuard::leak(guard);
 				if let Some(v) = x.as_mut_any().downcast_mut::<PortValue<T>>() {
 					if let Some(value) = &mut v.0 {
@@ -272,9 +300,17 @@ impl<T: 'static> PortValueWriteGuard<T> {
 						let ptr_seq_id: *mut SequenceNumber = &raw mut v.1;
 						(ptr_t, ptr_seq_id)
 					} else {
+						// SAFETY: Remove the lock
+						unsafe {
+							value.force_write_unlock();
+						};
 						return Err(Error::NoValueSet);
 					}
 				} else {
+					// SAFETY: Remove the lock
+					unsafe {
+						value.force_write_unlock();
+					};
 					return Err(Error::WrongDataType);
 				}
 			} else {
